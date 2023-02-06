@@ -16,12 +16,12 @@ export const createUser = async (user: User) => {
 
 // READ ALL USERS
 export const getAllUsers = async () => {
-  return await getData("user", "*");
+  return await getData("user", "*", "");
 };
 
 // READ A SPECIFIC USER
 export const getUser = async (id: string) => {
-  return await getData("user", id);
+  return await getData("user", "*", id);
 };
 
 // UPDATE A SPECIFIC USER

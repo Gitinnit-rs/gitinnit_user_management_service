@@ -1,10 +1,5 @@
 import { getData, insertRow, updateData, deleteData } from "../../utils/db";
-
-type User = {
-  name: string | null;
-  bio: string | null;
-  profile_photo: string | null;
-};
+import { User } from "./types";
 
 // CREATE A NEW USER
 export const createUser = async (user: User) => {
@@ -16,11 +11,14 @@ export const createUser = async (user: User) => {
 //   return await getData("user", null);
 // };
 
-// // READ A SPECIFIC USER
-// export const getUser = async (id: string) => {
-//   let matchQuery = { id: id };
-//   return await getData("user", matchQuery);
-// };
+// READ A SPECIFIC USER
+export const getUser = async (id: string) => {
+  let query = {
+    tableName: "user",
+    matchQuery: { id: id },
+  };
+  return await getData(query);
+};
 
 // UPDATE A SPECIFIC USER
 export const updateUser = async (id: string, user: User) => {

@@ -1,32 +1,56 @@
-import express, { Express } from "express";
-import { followUser, unfollowUser, getFollowers } from "./utils";
+import express from "express";
 import dotenv from "dotenv";
+import {
+  createUser,
+  getUser,
+  followUser,
+  unfollowUser,
+  getFollowers,
+} from "./utils";
+import { User } from "./types";
+
 dotenv.config();
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  const data = await getFollowers("2c163c9c-cfaf-4c72-80b1-f0857c153775");
-  res.send(data);
+// CREATE USER
+router.post("/", async (req, res) => {
+  const user: User = req.body;
+  const obj = await createUser(user);
+  res.status(obj.status).send(obj.data);
 });
 
+// GET SPECIFIC USER
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  const obj = await getUser(id);
+  res.status(obj.status).send(obj.data);
+});
+
+// FOLLOW A USER
 router.post("/follow", async (req, res) => {
   const { follower_id, following_id } = req.body;
   const obj = await followUser(follower_id, following_id);
   res.status(obj.status).send(obj.data);
 });
 
+// UNFOLLOW A USER
 router.post("/unfollow", async (req, res) => {
   const { follower_id, following_id } = req.body;
   const obj = await unfollowUser(follower_id, following_id);
   res.status(obj.status).send(obj.data);
 });
 
-// router.get("/:id", async (req, res) => {
-//   const { id } = req.params;
-//   console.log(id);
-//   const data = await getUser(id);
-//   res.send(data);
-// });
+// GET LIST OF FOLLOWERS FOR A USER
+router.get("/followers", async (req, res) => {
+  const { id } = req.body;
+  const data = await getFollowers(id);
+  res.send(data);
+});
+
+// TODO:
+// UPDATE USER
+// DELETE USER
 
 export default router;

@@ -12,7 +12,6 @@ app.use(express.json());
 app.use("/user", user);
 
 app.get("/", async (req, res) => {
-  // const data = await fetchData();
   res.send("HOME");
 });
 

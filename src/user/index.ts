@@ -1,26 +1,13 @@
-import { getData, insertRow } from "../../utils/db";
+import express, { Express } from "express";
+import { getAllUsers } from "./utils";
+import dotenv from "dotenv";
+dotenv.config();
 
-type User = {
-  name: string;
-  bio: string;
-  profile_photo: string;
-  music: number[] | null;
-  followers: number[] | null;
-  following: number[] | null;
-};
+const router = express.Router();
 
-// CREATE A NEW USER
-const createUser = async (user: User) => {
-  return await insertRow("user", user);
-};
+router.get("/", async (req, res) => {
+  const data = await getAllUsers();
+  res.send(data);
+});
 
-// READ ALL USERS
-const getUsers = async () => {
-  return await getData("user", "*");
-};
-
-// READ A SPECIFIC USER
-
-// UPDATE A SPECIFIC USER
-
-// DELETE A USER
+export default router;

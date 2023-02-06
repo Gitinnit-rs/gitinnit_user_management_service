@@ -10,7 +10,6 @@ type returnObject = {
   data: any; // TODO: CHANGE THIS
 };
 
-// FETCH
 export const getData = async (tableName: string, select: string | null) => {
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
   const selectQuery = select ?? "*";
@@ -46,12 +45,44 @@ export const insertRow = async (tableName: string, insert: object) => {
   }
   return obj;
 };
-// const { error } = await supabase
-//   .from('countries')
-//   .update({ name: 'Australia' })
-//   .eq('id', 1)
 
-// const { error } = await supabase
-//   .from('countries')
-//   .delete()
-//   .eq('id', 1)
+export const updateData = async (
+  tableName: string,
+  id: string,
+  update: object,
+) => {
+  const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const updateQuery = update ?? "*";
+  let { data, error } = await supabase
+    .from(tableName)
+    .update(updateQuery)
+    .eq("id", id);
+  let obj: returnObject = {
+    status: 200,
+    data: null,
+  };
+  if (error) {
+    const errorMessage = error;
+    obj.status = 4001;
+    obj.data = errorMessage;
+  } else {
+    obj.data = data;
+  }
+  return obj;
+};
+export const deleteData = async (tableName: string, id: string) => {
+  const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let { data, error } = await supabase.from(tableName).delete().eq("id", id);
+  let obj: returnObject = {
+    status: 200,
+    data: null,
+  };
+  if (error) {
+    const errorMessage = error;
+    obj.status = 4001;
+    obj.data = errorMessage;
+  } else {
+    obj.data = data;
+  }
+  return obj;
+};

@@ -1,10 +1,13 @@
 import express, { Express } from "express";
-import { fetchData } from "../utils/db";
 import dotenv from "dotenv";
 dotenv.config();
 
+import user from "./user";
+
 const app: Express = express();
 const PORT = process.env.PORT;
+
+app.use("/user", user);
 
 app.get("/", async (req, res) => {
   // const data = await fetchData();

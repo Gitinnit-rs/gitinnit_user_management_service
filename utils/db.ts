@@ -10,17 +10,26 @@ type returnObject = {
   data: any; // TODO: CHANGE THIS
 };
 
-export const getData = async (
-  tableName: string,
-  select: string | null,
-  id: string | null,
-) => {
+type searchParameters = {
+  tableName: string;
+  selectQuery?: string | null;
+  matchQuery?: object | null;
+};
+
+export const getData = async ({
+  tableName,
+  selectQuery = null,
+  matchQuery = null,
+}: searchParameters) => {
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const selectQuery = select ?? "*";
-  let { data, error } = await supabase
-    .from(tableName)
-    .select(selectQuery)
-    .eq("id", id);
+  let query = supabase.from(tableName).select();
+  if (selectQuery !== null) {
+    query.select(selectQuery);
+  }
+  if (matchQuery !== null) {
+    query = query.match(matchQuery);
+  }
+  let { data, error } = await query;
   let obj: returnObject = {
     status: 200,
     data: null,
@@ -55,19 +64,23 @@ export const insertRow = async (tableName: string, insert: object) => {
 
 export const updateData = async (
   tableName: string,
-  id: string,
-  update: object,
+  matchQuery: object | null,
+  updateQuery: object,
 ) => {
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const updateQuery = update ?? "*";
-  let { data, error } = await supabase
-    .from(tableName)
-    .update(updateQuery)
-    .eq("id", id);
   let obj: returnObject = {
     status: 200,
     data: null,
   };
+  let query = supabase.from(tableName).update(updateQuery);
+  if (matchQuery !== null) {
+    query = query.match(matchQuery);
+  } else {
+    obj.status = 4001;
+    obj.data = "NO MATCH QUERY PROVIDED";
+    return obj;
+  }
+  let { data, error } = await query;
   if (error) {
     const errorMessage = error;
     obj.status = 4001;
@@ -77,9 +90,12 @@ export const updateData = async (
   }
   return obj;
 };
-export const deleteData = async (tableName: string, id: string) => {
+export const deleteData = async (tableName: string, matchQuery: object) => {
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
-  let { data, error } = await supabase.from(tableName).delete().eq("id", id);
+  let { data, error } = await supabase
+    .from(tableName)
+    .delete()
+    .match(matchQuery);
   let obj: returnObject = {
     status: 200,
     data: null,

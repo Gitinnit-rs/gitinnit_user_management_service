@@ -4,9 +4,6 @@ type User = {
   name: string | null;
   bio: string | null;
   profile_photo: string | null;
-  music: number[] | null;
-  followers: number[] | null;
-  following: number[] | null;
 };
 
 // CREATE A NEW USER
@@ -15,21 +12,77 @@ export const createUser = async (user: User) => {
 };
 
 // READ ALL USERS
-export const getAllUsers = async () => {
-  return await getData("user", "*", "");
-};
+// export const getAllUsers = async () => {
+//   return await getData("user", null);
+// };
 
-// READ A SPECIFIC USER
-export const getUser = async (id: string) => {
-  return await getData("user", "*", id);
-};
+// // READ A SPECIFIC USER
+// export const getUser = async (id: string) => {
+//   let matchQuery = { id: id };
+//   return await getData("user", matchQuery);
+// };
 
 // UPDATE A SPECIFIC USER
 export const updateUser = async (id: string, user: User) => {
-  return await updateData("user", id, user);
+  let matchQuery = { id: id };
+  return await updateData("user", matchQuery, user);
 };
 
 // DELETE A USER
 export const deleteUser = async (id: string) => {
-  return await deleteData("user", id);
+  let matchQuery = { id: id };
+  return await deleteData("user", matchQuery);
+};
+
+// FOLLOW USER
+export const followUser = async (follower_id: string, following_id: string) => {
+  let obj = {
+    follower_id: follower_id,
+    following_id: following_id,
+  };
+  return await insertRow("follow", obj);
+};
+
+export const unfollowUser = async (
+  follower_id: string,
+  following_id: string,
+) => {
+  let matchQuery = {
+    follower_id: follower_id,
+    following_id: following_id,
+  };
+
+  return await deleteData("follow", matchQuery);
+};
+
+export const getFollowers = async (following_id: string) => {
+  let query = {
+    tableName: "follow",
+    selectQuery: "follower_id",
+    matchQuery: {
+      following_id: following_id,
+    },
+  };
+  let data = await getData(query);
+  if (data.status !== 200) {
+    return data;
+  }
+
+  type returnType = {
+    status: number;
+    data: number[];
+  };
+  type follower_object = {
+    follower_id: number;
+  };
+
+  let obj: returnType = {
+    status: 200,
+    data: [],
+  };
+  obj.status = data.status;
+  data.data.forEach((element: follower_object) => {
+    obj.data.push(element.follower_id);
+  });
+  return obj;
 };

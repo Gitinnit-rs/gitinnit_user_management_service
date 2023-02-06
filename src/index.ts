@@ -4,9 +4,11 @@ dotenv.config();
 
 import user from "./user";
 
-const app: Express = express();
 const PORT = process.env.PORT;
 
+const app: Express = express();
+
+app.use(express.json());
 app.use("/user", user);
 
 app.get("/", async (req, res) => {

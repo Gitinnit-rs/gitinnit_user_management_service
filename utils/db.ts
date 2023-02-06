@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import {  } from "@supabase/supabase-js/dist/main/lib/types";
 import { Database } from "../lib/database.types";
 import dotenv from "dotenv";
 dotenv.config();
@@ -21,6 +22,8 @@ export const getData = async (
     .from(tableName)
     .select(selectQuery)
     .eq("id", id);
+
+
   let obj: returnObject = {
     status: 200,
     data: null,

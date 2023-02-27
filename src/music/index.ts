@@ -1,7 +1,14 @@
 import express from "express";
 import dotenv from "dotenv";
-// import {} from "./utils";
-// import {} from "./types";
+import {
+  addMusicFile,
+  getMusic,
+  getMusicByUser,
+  likeMusic,
+  dislikeMusic,
+  createAlbum,
+} from "./utils";
+// import { Music, MusicMapping } from "./types";
 
 dotenv.config();
 
@@ -9,23 +16,39 @@ const router = express.Router();
 
 // CREATE MUSIC
 router.post("/", async (req, res) => {
-  // const user: User = req.body;
-  // const obj = await createUser(user);
-  // res.status(obj.status).send(obj.data);
+  const { music, artists } = req.body;
+  const obj = await addMusicFile(music, artists);
+  res.status(obj.status).send(obj.data);
 });
 
-// GET SPECIFIC USER
+// GET MUSIC BY ID
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
-  console.log(id);
-  // const obj = await getUser(id);
-  // res.status(obj.status).send(obj.data);
+  const obj = await getMusic(id);
+  res.status(obj.status).send(obj.data);
+});
+
+// GET MUSIC BY ARTIST
+router.get("/user/:user_id", async (req, res) => {
+  const { user_id } = req.params;
+  const obj = await getMusicByUser(user_id);
+  res.status(obj.status).send(obj.data);
 });
 
 // TODO:
 // LIKE MUSIC
+router.patch("/like/:id", async (req, res) => {
+  const { id } = req.params;
+  const obj = await likeMusic(id);
+  res.status(obj.status).send(obj.data);
+});
 
 // DISLIKE MUSIC
+router.patch("/dislike/:id", async (req, res) => {
+  const { id } = req.params;
+  const obj = await dislikeMusic(id);
+  res.status(obj.status).send(obj.data);
+});
 
 // REMOVE LIKE/DISLIKE
 
@@ -34,7 +57,11 @@ router.get("/:id", async (req, res) => {
 // DELETE MUSIC
 
 // CREATE ALBUM
-
+router.post("/album", async (req, res) => {
+  const album = req.body;
+  const obj = await createAlbum(album);
+  res.status(obj.status).send(obj.data);
+});
 // ADD MUSIC TO ALBUM
 
 // REMOVE MUSIC FROM ALBUM

@@ -15,6 +15,7 @@ type searchParameters = {
   tableName: string;
   selectQuery?: string | null;
   matchQuery?: object | null;
+  updateQuery?: object | null;
 };
 
 export const getData = async ({
@@ -63,11 +64,11 @@ export const insertRow = async (tableName: string, insert: object) => {
   return obj;
 };
 
-export const updateData = async (
-  tableName: string,
-  matchQuery: object | null,
-  updateQuery: object,
-) => {
+export const updateData = async ({
+  tableName,
+  updateQuery = null,
+  matchQuery = null,
+}: searchParameters) => {
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
   let obj: returnObject = {
     status: 200,

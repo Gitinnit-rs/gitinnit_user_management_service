@@ -1,17 +1,59 @@
-import { getData, insertRow, updateData, deleteData } from "../../utils/db";
+import {
+  getData,
+  insertRow,
+  updateData,
+  deleteData,
+  addToStorage,
+} from "../../utils/db";
+import { v4 as uuid } from "uuid";
+
 import { Album, Music, MusicMapping, AlbumMapping } from "./types";
 
 // CREATE A MUSIC ROW
-export const addMusicFile = async (music: Music, artists: string[]) => {
-  const music_obj = await insertRow("music", music);
-  artists.forEach(async (artist: string) => {
-    const music_mapping: MusicMapping = {
-      music_id: music_obj.data.id,
-      artist_id: artist,
-    };
-    const obj = await addMusicArtistMapping(music_mapping);
-  });
-  return music_obj;
+export const addMusicFile = async (
+  musicFile: File,
+  music_raw: string,
+  artists_raw: string,
+) => {
+  let music = JSON.parse(music_raw);
+  music.release_date = new Date();
+  const artists = artists_raw.split(",");
+  const fileId: string = uuid();
+
+  const music_file = await addToStorage(
+    `music/${artists[0]}`,
+    fileId,
+    musicFile,
+  );
+
+  if (music_file.status !== 200) {
+    return { status: 400, data: "Error while adding music file" };
+  }
+  const newMusicObj = { ...music, file: music_file.data.path };
+  const music_obj = await insertRow("music", newMusicObj);
+  if (music_obj.status !== 200) {
+    return { status: 400, data: "Error while adding music meta data" };
+  }
+  var obj: boolean[] = await Promise.all(
+    artists.map(async (artist): Promise<boolean> => {
+      const music_mapping: MusicMapping = {
+        music_id: music_obj.data[0].id,
+        artist_id: artist,
+      };
+      const obj = await addMusicArtistMapping(music_mapping);
+      console.log(obj);
+      return obj.status === 200;
+    }),
+  );
+  if (
+    obj.every(e => {
+      return e === true;
+    })
+  ) {
+    return { status: 200, data: "SUCCESS" };
+  } else {
+    return { status: 400, data: "Error while adding mapping" };
+  }
 };
 
 // Add artist-music mapping

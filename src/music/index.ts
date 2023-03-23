@@ -1,5 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
+import multer from "multer";
+
 import {
   addMusicFile,
   getMusic,
@@ -13,11 +15,13 @@ import {
 dotenv.config();
 
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
 // CREATE MUSIC
-router.post("/", async (req, res) => {
-  const { music, artists } = req.body;
-  const obj = await addMusicFile(music, artists);
+router.post("/", upload.any(), async (req, res) => {
+  const { meta, artists } = req.body;
+  const musicFile = req.files.buffer;
+  const obj = await addMusicFile(musicFile, meta, artists);
   res.status(obj.status).send(obj.data);
 });
 

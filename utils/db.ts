@@ -1,22 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
-import {} from "@supabase/supabase-js/dist/main/lib/types";
 import { Database } from "../lib/database.types";
+import { returnObject, searchParameters } from "./types";
 import dotenv from "dotenv";
 dotenv.config();
+
 const SUPABASE_URL = process.env.SUPABASE_URL ?? "";
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ?? "";
-
-type returnObject = {
-  status: number;
-  data: any; // TODO: CHANGE THIS
-};
-
-type searchParameters = {
-  tableName: string;
-  selectQuery?: string | null;
-  matchQuery?: object | null;
-  updateQuery?: object | null;
-};
 
 export const getData = async ({
   tableName,
@@ -38,7 +27,7 @@ export const getData = async ({
   };
   if (error) {
     const errorMessage = error;
-    obj.status = 4001;
+    obj.status = 400;
     obj.data = errorMessage;
   } else {
     obj.data = data;
@@ -49,14 +38,17 @@ export const getData = async ({
 export const insertRow = async (tableName: string, insert: object) => {
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
   const insertQuery = insert ?? "*";
-  let { data, error } = await supabase.from(tableName).insert(insertQuery);
+  let { data, error } = await supabase
+    .from(tableName)
+    .insert(insertQuery)
+    .select();
   let obj: returnObject = {
     status: 200,
-    data: null,
+    data: data,
   };
   if (error) {
     const errorMessage = error;
-    obj.status = 4001;
+    obj.status = 400;
     obj.data = errorMessage;
   } else {
     obj.data = data;
@@ -78,20 +70,21 @@ export const updateData = async ({
   if (matchQuery !== null) {
     query = query.match(matchQuery);
   } else {
-    obj.status = 4001;
+    obj.status = 400;
     obj.data = "NO MATCH QUERY PROVIDED";
     return obj;
   }
   let { data, error } = await query;
   if (error) {
     const errorMessage = error;
-    obj.status = 4001;
+    obj.status = 400;
     obj.data = errorMessage;
   } else {
     obj.data = data;
   }
   return obj;
 };
+
 export const deleteData = async (tableName: string, matchQuery: object) => {
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
   let { data, error } = await supabase
@@ -104,7 +97,76 @@ export const deleteData = async (tableName: string, matchQuery: object) => {
   };
   if (error) {
     const errorMessage = error;
-    obj.status = 4001;
+    obj.status = 400;
+    obj.data = errorMessage;
+  } else {
+    obj.data = data;
+  }
+  return obj;
+};
+
+export const addToStorage = async (
+  bucketAddress: string,
+  name: string,
+  file: File,
+) => {
+  const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const { data, error } = await supabase.storage
+    .from(bucketAddress)
+    .upload(name, file);
+  let obj: returnObject = {
+    status: 200,
+    data: null,
+  };
+  if (error) {
+    const errorMessage = error;
+    obj.status = 400;
+    obj.data = errorMessage;
+  } else {
+    obj.data = data;
+  }
+  return obj;
+};
+
+export const downloadStorageObject = async (
+  bucketAddress: string,
+  name: string,
+) => {
+  const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const { data, error } = await supabase.storage
+    .from(bucketAddress)
+    .download(name);
+  let obj: returnObject = {
+    status: 200,
+    data: null,
+  };
+  if (error) {
+    const errorMessage = error;
+    obj.status = 400;
+    obj.data = errorMessage;
+  } else {
+    obj.data = data;
+  }
+  return obj;
+};
+export const deleteStorageObject = async (
+  bucketAddress: string,
+  name: string,
+) => {
+  const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const { data, error } = await supabase.storage
+    .from(bucketAddress)
+    .remove([name]);
+
+  let obj: returnObject = {
+    status: 200,
+    data: null,
+  };
+  if (error) {
+    const errorMessage = error;
+    obj.status = 400;
     obj.data = errorMessage;
   } else {
     obj.data = data;

@@ -1,9 +1,7 @@
 export type Music = {
-  name: string | null;
+  name: string;
   release_date: string | null;
   like_count: number | null;
-  album_id: string | null;
-  file: string | null;
 };
 
 export type MusicMapping = {

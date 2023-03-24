@@ -11,25 +11,30 @@ import { Album, Music, MusicMapping, AlbumMapping } from "./types";
 
 // CREATE A MUSIC ROW
 export const addMusicFile = async (
-  musicFile: File,
-  music_raw: string,
+  musicFile: any,
+  meta: string,
   artists_raw: string,
 ) => {
-  let music = JSON.parse(music_raw);
-  music.release_date = new Date();
+  let music_details = JSON.parse(meta);
+  music_details.release_date = new Date();
   const artists = artists_raw.split(",");
   const fileId: string = uuid();
 
+  const fileOptions = {
+    contentType: musicFile.mimetype,
+  };
+  console.log(musicFile);
   const music_file = await addToStorage(
     `music/${artists[0]}`,
     fileId,
-    musicFile,
+    musicFile.buffer,
+    fileOptions,
   );
 
   if (music_file.status !== 200) {
     return { status: 400, data: "Error while adding music file" };
   }
-  const newMusicObj = { ...music, file: music_file.data.path };
+  const newMusicObj = { ...music_details, file: music_file.data.path };
   const music_obj = await insertRow("music", newMusicObj);
   if (music_obj.status !== 200) {
     return { status: 400, data: "Error while adding music meta data" };

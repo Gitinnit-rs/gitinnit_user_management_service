@@ -108,12 +108,13 @@ export const deleteData = async (tableName: string, matchQuery: object) => {
 export const addToStorage = async (
   bucketAddress: string,
   name: string,
-  file: File,
+  file: any,
+  fileOptions: Object,
 ) => {
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
   const { data, error } = await supabase.storage
     .from(bucketAddress)
-    .upload(name, file);
+    .upload(name, file, fileOptions);
   let obj: returnObject = {
     status: 200,
     data: null,

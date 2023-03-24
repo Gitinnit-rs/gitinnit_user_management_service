@@ -18,11 +18,23 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 // CREATE MUSIC
-router.post("/", upload.any(), async (req, res) => {
+router.post("/", upload.array("files", 5), async (req, res) => {
+  /*
+  meta:{name, likes_count, etc}
+  artists: comma separated uuids of users
+  musicFile: multipart file with buffer
+  */
   const { meta, artists } = req.body;
-  const musicFile = req.files.buffer;
-  const obj = await addMusicFile(musicFile, meta, artists);
-  res.status(obj.status).send(obj.data);
+  if (!req.files) {
+    res.status(400).send("No music file found");
+    return;
+  } else {
+    const musicFile = req.files[0];
+    const obj = await addMusicFile(musicFile, meta, artists);
+    res.status(obj.status).send(obj.data);
+
+    // res.send("0");
+  }
 });
 
 // GET MUSIC BY ID

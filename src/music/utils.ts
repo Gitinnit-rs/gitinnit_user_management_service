@@ -4,6 +4,7 @@ import {
   updateData,
   deleteData,
   addToStorage,
+  getPublicUrl,
 } from "../../utils/db";
 import { v4 as uuid } from "uuid";
 
@@ -23,7 +24,6 @@ export const addMusicFile = async (
   const fileOptions = {
     contentType: musicFile.mimetype,
   };
-  console.log(musicFile);
   const music_file = await addToStorage(
     `music/${artists[0]}`,
     fileId,
@@ -34,7 +34,11 @@ export const addMusicFile = async (
   if (music_file.status !== 200) {
     return { status: 400, data: "Error while adding music file" };
   }
-  const newMusicObj = { ...music_details, file: music_file.data.path };
+  const publicUrl = await getPublicUrl(
+    `music/${artists[0]}`,
+    music_file.data.path,
+  );
+  const newMusicObj = { ...music_details, file: publicUrl.data.publicUrl };
   const music_obj = await insertRow("music", newMusicObj);
   if (music_obj.status !== 200) {
     return { status: 400, data: "Error while adding music meta data" };
@@ -46,7 +50,6 @@ export const addMusicFile = async (
         artist_id: artist,
       };
       const obj = await addMusicArtistMapping(music_mapping);
-      console.log(obj);
       return obj.status === 200;
     }),
   );

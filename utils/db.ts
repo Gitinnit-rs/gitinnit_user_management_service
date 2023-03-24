@@ -129,6 +129,13 @@ export const addToStorage = async (
   return obj;
 };
 
+export const getPublicUrl = async (bucket: string, path: string) => {
+  const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const url = await supabase.storage.from(bucket).getPublicUrl(path);
+  return url;
+};
+
 export const downloadStorageObject = async (
   bucketAddress: string,
   name: string,

@@ -23,7 +23,12 @@ export const getUser = async (id: string) => {
 // UPDATE A SPECIFIC USER
 export const updateUser = async (id: string, user: User) => {
   let matchQuery = { id: id };
-  return await updateData("user", matchQuery, user);
+  let query = {
+    tableName: "user",
+    updateQuery: user,
+    matchQuery: matchQuery,
+  };
+  return await updateData(query);
 };
 
 // DELETE A USER

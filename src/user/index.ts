@@ -6,6 +6,7 @@ import {
   followUser,
   unfollowUser,
   getFollowers,
+  updateUser,
 } from "./utils";
 import { User } from "./types";
 
@@ -46,11 +47,17 @@ router.post("/unfollow", async (req, res) => {
 router.get("/followers", async (req, res) => {
   const { id } = req.body;
   const data = await getFollowers(id);
-  res.send(data);
+  res.status(data.status).send(data.data);
 });
 
 // TODO:
 // UPDATE USER
+router.patch("/", async (req, res) => {
+  const { id, user } = req.body;
+  console.log(id, user);
+  const data = await updateUser(id, user);
+  res.status(data.status).send(data.data);
+});
 // DELETE USER
 
 export default router;

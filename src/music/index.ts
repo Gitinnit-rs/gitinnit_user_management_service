@@ -11,6 +11,7 @@ import {
   createAlbum,
   addMusicAlbumMapping,
   removeMusicAlbumMapping,
+  getAlbumByArtist,
 } from "./utils";
 // import { Music, MusicMapping } from "./types";
 
@@ -74,9 +75,17 @@ router.post("/album", async (req, res) => {
   res.status(obj.status).send(obj.data);
 });
 
+// GET ALBUM BY ID
 router.get("/album/:id", async (req, res) => {
   const { id } = req.params;
   const obj = await getAlbum(id);
+  res.status(obj.status).send(obj.data);
+});
+
+// GET ALBUM BY ID
+router.get("/album/user/:id", async (req, res) => {
+  const { id } = req.params;
+  const obj = await getAlbumByArtist(id);
   res.status(obj.status).send(obj.data);
 });
 

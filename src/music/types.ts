@@ -13,7 +13,7 @@ export type Album = {
   name: string;
   desc: string | null;
   cover: string;
-  artist: object;
+  owner_artist: string;
   release_date: string | null;
 };
 

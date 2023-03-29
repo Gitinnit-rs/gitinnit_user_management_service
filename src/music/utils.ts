@@ -132,6 +132,15 @@ export const getAlbum = async (id: string) => {
   return await getData(query);
 };
 
+// GET ALBUMS BY ARTIST
+export const getAlbumByArtist = async (id: string) => {
+  let query = {
+    tableName: "albums",
+    matchQuery: { owner_artist: id },
+  };
+  return await getData(query);
+};
+
 // ADD MUSIC TO ALBUM
 export const addMusicAlbumMapping = async (
   album_id: string,

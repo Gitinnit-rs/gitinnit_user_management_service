@@ -123,6 +123,15 @@ export const createAlbum = async (album: Album) => {
   return await insertRow("album", album);
 };
 
+// GET AN ALBUM
+export const getAlbum = async (id: string) => {
+  const query = {
+    tableName: "album",
+    matchQuery: { id: id },
+  };
+  return await getData(query);
+};
+
 // ADD MUSIC TO ALBUM
 export const addMusicAlbumMapping = async (
   album_id: string,

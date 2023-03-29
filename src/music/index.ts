@@ -24,7 +24,7 @@ router.post("/", upload.array("files", 5), async (req, res) => {
   /*
   meta:{name, likes_count, etc}
   artists: comma separated uuids of users
-  musicFile: multipart file with buffer
+  file: multipart file with buffer
   */
   const { meta, artists } = req.body;
   if (!req.files) {
@@ -74,6 +74,12 @@ router.post("/album", async (req, res) => {
   res.status(obj.status).send(obj.data);
 });
 
+router.get("/album/:id", async (req, res) => {
+  const { id } = req.params;
+  const obj = await getAlbum(id);
+  res.status(obj.status).send(obj.data);
+});
+
 // ADD MUSIC TO ALBUM
 router.post("/add_to_album", async (req, res) => {
   // albumId is the id of albums type: string
@@ -82,6 +88,7 @@ router.post("/add_to_album", async (req, res) => {
   const obj = await addMusicAlbumMapping(albumId, musics);
   res.status(obj.status).send(obj.data);
 });
+
 // REMOVE MUSIC FROM ALBUM
 router.post("/remove_from_album", async (req, res) => {
   // albumId is the id of albums type: string

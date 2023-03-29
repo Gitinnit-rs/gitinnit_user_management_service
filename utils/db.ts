@@ -105,14 +105,33 @@ export const deleteData = async (tableName: string, matchQuery: object) => {
   return obj;
 };
 
+export const createBucket = async (bucketAddress: string) => {
+  const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let { data, error } = await supabase.storage.getBucket("avatars");
+  if (error) {
+    let { data, error } = await supabase.storage.createBucket(bucketAddress, {
+      public: true,
+    });
+    if (error) {
+      return false;
+    } else {
+      return data;
+    }
+  }
+  return data;
+};
 export const addToStorage = async (
   bucketAddress: string,
   name: string,
   file: any,
   fileOptions: Object,
 ) => {
+  const bucket = await createBucket(bucketAddress);
+  if (!bucket) {
+    return { status: 500, data: "Bucket creation error" };
+  }
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const { data, error } = await supabase.storage
+  let { data, error } = await supabase.storage
     .from(bucketAddress)
     .upload(name, file, fileOptions);
   let obj: returnObject = {
@@ -129,10 +148,14 @@ export const addToStorage = async (
   return obj;
 };
 
-export const getPublicUrl = async (bucket: string, path: string) => {
+export const getPublicUrl = async (bucketAddress: string, path: string) => {
+  const bucket = await createBucket(bucketAddress);
+  if (!bucket) {
+    return { status: 500, data: "Bucket not found error" };
+  }
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const url = await supabase.storage.from(bucket).getPublicUrl(path);
+  const url = await supabase.storage.from(bucketAddress).getPublicUrl(path);
   return url;
 };
 
@@ -140,6 +163,10 @@ export const downloadStorageObject = async (
   bucketAddress: string,
   name: string,
 ) => {
+  const bucket = await createBucket(bucketAddress);
+  if (!bucket) {
+    return { status: 500, data: "Bucket not found error" };
+  }
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const { data, error } = await supabase.storage
@@ -162,6 +189,11 @@ export const deleteStorageObject = async (
   bucketAddress: string,
   name: string,
 ) => {
+  const bucket = await createBucket(bucketAddress);
+  if (!bucket) {
+    return { status: 500, data: "Bucket not found error" };
+  }
+
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const { data, error } = await supabase.storage

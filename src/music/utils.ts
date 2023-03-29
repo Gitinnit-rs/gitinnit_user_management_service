@@ -128,15 +128,50 @@ export const addMusicAlbumMapping = async (
   album_id: string,
   musics: string[],
 ) => {
-  let obj = {};
-  musics.forEach(async (music: string) => {
-    const album_mapping: AlbumMapping = {
-      album_id: album_id,
-      music_id: music,
-    };
-    obj = await insertRow("album_mapping", album_mapping);
-  });
-  return obj;
+  var obj: boolean[] = await Promise.all(
+    musics.map(async (music): Promise<boolean> => {
+      const album_mapping: AlbumMapping = {
+        album_id: album_id,
+        music_id: music,
+      };
+      const obj = await insertRow("album_mapping", album_mapping);
+      return obj.status === 200;
+    }),
+  );
+  if (
+    obj.every(e => {
+      return e === true;
+    })
+  ) {
+    return { status: 200, data: "SUCCESS" };
+  } else {
+    return { status: 400, data: "Error while adding mapping" };
+  }
+};
+
+export const removeMusicAlbumMapping = async (
+  album_id: string,
+  musics: string[],
+) => {
+  var obj: boolean[] = await Promise.all(
+    musics.map(async (music): Promise<boolean> => {
+      const album_mapping: AlbumMapping = {
+        album_id: album_id,
+        music_id: music,
+      };
+      const obj = await deleteData("album_mapping", album_mapping);
+      return obj.status === 200;
+    }),
+  );
+  if (
+    obj.every(e => {
+      return e === true;
+    })
+  ) {
+    return { status: 200, data: "SUCCESS" };
+  } else {
+    return { status: 400, data: "Error while adding mapping" };
+  }
 };
 
 // TODO: convert to procedures

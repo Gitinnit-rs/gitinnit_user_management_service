@@ -9,6 +9,8 @@ import {
   likeMusic,
   dislikeMusic,
   createAlbum,
+  addMusicAlbumMapping,
+  removeMusicAlbumMapping,
 } from "./utils";
 // import { Music, MusicMapping } from "./types";
 
@@ -51,7 +53,6 @@ router.get("/user/:user_id", async (req, res) => {
   res.status(obj.status).send(obj.data);
 });
 
-// TODO:
 // LIKE MUSIC
 router.patch("/like/:id", async (req, res) => {
   const { id } = req.params;
@@ -66,20 +67,33 @@ router.patch("/dislike/:id", async (req, res) => {
   res.status(obj.status).send(obj.data);
 });
 
-// REMOVE LIKE/DISLIKE
-
-// UPDATE MUSIC
-
-// DELETE MUSIC
-
 // CREATE ALBUM
 router.post("/album", async (req, res) => {
   const album = req.body;
   const obj = await createAlbum(album);
   res.status(obj.status).send(obj.data);
 });
-// ADD MUSIC TO ALBUM
 
+// ADD MUSIC TO ALBUM
+router.post("/add_to_album", async (req, res) => {
+  // albumId is the id of albums type: string
+  // musics is a list of music ids type: string[]
+  const { albumId, musics } = req.body;
+  const obj = await addMusicAlbumMapping(albumId, musics);
+  res.status(obj.status).send(obj.data);
+});
 // REMOVE MUSIC FROM ALBUM
+router.post("/remove_from_album", async (req, res) => {
+  // albumId is the id of albums type: string
+  // musics is a list of music ids type: string[]
+  const { albumId, musics } = req.body;
+  const obj = await removeMusicAlbumMapping(albumId, musics);
+  res.status(obj.status).send(obj.data);
+});
+
+// TODO:
+// REMOVE LIKE/DISLIKE
+// UPDATE MUSIC
+// DELETE MUSIC
 
 export default router;

@@ -50,7 +50,6 @@ router.get("/followers", async (req, res) => {
   res.status(data.status).send(data.data);
 });
 
-// TODO:
 // UPDATE USER
 router.patch("/", async (req, res) => {
   const { id, user } = req.body;
@@ -58,6 +57,8 @@ router.patch("/", async (req, res) => {
   const data = await updateUser(id, user);
   res.status(data.status).send(data.data);
 });
+
+//TODO
 // DELETE USER
 
 export default router;

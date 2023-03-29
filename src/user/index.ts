@@ -7,6 +7,7 @@ import {
   unfollowUser,
   getFollowers,
   updateUser,
+  getUserByName,
 } from "./utils";
 import { User } from "./types";
 
@@ -24,8 +25,14 @@ router.post("/", async (req, res) => {
 // GET SPECIFIC USER
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
-  console.log(id);
   const obj = await getUser(id);
+  res.status(obj.status).send(obj.data);
+});
+
+// GET SPECIFIC USER BY NAME
+router.get("/:name", async (req, res) => {
+  const { name } = req.params;
+  const obj = await getUserByName(name);
   res.status(obj.status).send(obj.data);
 });
 

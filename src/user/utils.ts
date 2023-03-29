@@ -1,15 +1,16 @@
-import { getData, insertRow, updateData, deleteData } from "../../utils/db";
+import {
+  getData,
+  insertRow,
+  updateData,
+  deleteData,
+  getSimilarData,
+} from "../../utils/db";
 import { User } from "./types";
 
 // CREATE A NEW USER
 export const createUser = async (user: User) => {
   return await insertRow("user", user);
 };
-
-// READ ALL USERS
-// export const getAllUsers = async () => {
-//   return await getData("user", null);
-// };
 
 // READ A SPECIFIC USER
 export const getUser = async (id: string) => {
@@ -18,6 +19,15 @@ export const getUser = async (id: string) => {
     matchQuery: { id: id },
   };
   return await getData(query);
+};
+
+// READ A SPECIFIC USER BY NAME
+export const getUserByName = async (name: string) => {
+  let query = {
+    tableName: "user",
+    likeQuery: "%" + name + "%",
+  };
+  return await getSimilarData(query);
 };
 
 // UPDATE A SPECIFIC USER
@@ -46,6 +56,7 @@ export const followUser = async (follower_id: string, following_id: string) => {
   return await insertRow("follow", obj);
 };
 
+// UNFOLLOW USER
 export const unfollowUser = async (
   follower_id: string,
   following_id: string,
@@ -58,6 +69,7 @@ export const unfollowUser = async (
   return await deleteData("follow", matchQuery);
 };
 
+// GET FOLLOWERS OF A USER
 export const getFollowers = async (following_id: string) => {
   let query = {
     tableName: "follow",

@@ -34,6 +34,33 @@ export const getData = async ({
   }
   return obj;
 };
+export const getSimilarData = async ({
+  tableName,
+  selectQuery = null,
+  likeQuery = null,
+}: searchParameters) => {
+  const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let query = supabase.from(tableName).select();
+  if (selectQuery !== null) {
+    query.select(selectQuery);
+  }
+  if (likeQuery !== null) {
+    query = query.like("name", likeQuery);
+  }
+  let { data, error } = await query;
+  let obj: returnObject = {
+    status: 200,
+    data: null,
+  };
+  if (error) {
+    const errorMessage = error;
+    obj.status = 400;
+    obj.data = errorMessage;
+  } else {
+    obj.data = data;
+  }
+  return obj;
+};
 
 export const insertRow = async (tableName: string, insert: object) => {
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);

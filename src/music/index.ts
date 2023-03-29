@@ -3,17 +3,19 @@ import dotenv from "dotenv";
 import multer from "multer";
 
 import {
-  addMusicFile,
+  getAlbum,
   getMusic,
-  getMusicByUser,
   likeMusic,
-  dislikeMusic,
   createAlbum,
+  dislikeMusic,
+  addMusicFile,
+  getAlbumByName,
+  getMusicByName,
+  getMusicByUser,
+  getAlbumByArtist,
   addMusicAlbumMapping,
   removeMusicAlbumMapping,
-  getAlbumByArtist,
 } from "./utils";
-// import { Music, MusicMapping } from "./types";
 
 dotenv.config();
 
@@ -32,7 +34,7 @@ router.post("/", upload.array("files", 5), async (req, res) => {
     res.status(400).send("No music file found");
     return;
   } else {
-    const musicFile = req.files[0];
+    const musicFile = (req.files as Express.Multer.File[])[0];
     const obj = await addMusicFile(musicFile, meta, artists);
     res.status(obj.status).send(obj.data);
 
@@ -51,6 +53,13 @@ router.get("/:id", async (req, res) => {
 router.get("/user/:user_id", async (req, res) => {
   const { user_id } = req.params;
   const obj = await getMusicByUser(user_id);
+  res.status(obj.status).send(obj.data);
+});
+
+// GET MUSIC BY Name
+router.get("/name/:name", async (req, res) => {
+  const { name } = req.params;
+  const obj = await getMusicByName(name);
   res.status(obj.status).send(obj.data);
 });
 
@@ -86,6 +95,13 @@ router.get("/album/:id", async (req, res) => {
 router.get("/album/user/:id", async (req, res) => {
   const { id } = req.params;
   const obj = await getAlbumByArtist(id);
+  res.status(obj.status).send(obj.data);
+});
+
+// GET ALBUM BY NAME
+router.get("/album/name/:name", async (req, res) => {
+  const { name } = req.params;
+  const obj = await getAlbumByName(name);
   res.status(obj.status).send(obj.data);
 });
 

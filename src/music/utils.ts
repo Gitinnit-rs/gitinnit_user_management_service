@@ -5,6 +5,7 @@ import {
   deleteData,
   addToStorage,
   getPublicUrl,
+  getSimilarData,
 } from "../../utils/db";
 import { v4 as uuid } from "uuid";
 
@@ -87,6 +88,15 @@ export const getMusicByUser = async (id: string) => {
   return await getData(query);
 };
 
+// GET MUSIC BY NAME
+export const getMusicByName = async (name: string) => {
+  let query = {
+    tableName: "music",
+    likeQuery: "%" + name + "%",
+  };
+  return await getSimilarData(query);
+};
+
 // LIKE MUSIC
 export const likeMusic = async (id: string) => {
   let query = {
@@ -139,6 +149,15 @@ export const getAlbumByArtist = async (id: string) => {
     matchQuery: { owner_artist: id },
   };
   return await getData(query);
+};
+
+// GET ALBUM BY NAME
+export const getAlbumByName = async (name: string) => {
+  let query = {
+    tableName: "album",
+    likeQuery: "%" + name + "%",
+  };
+  return await getSimilarData(query);
 };
 
 // ADD MUSIC TO ALBUM

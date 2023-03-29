@@ -8,4 +8,5 @@ export type searchParameters = {
   selectQuery?: string | null;
   matchQuery?: object | null;
   updateQuery?: object | null;
+  likeQuery?: string | null;
 };

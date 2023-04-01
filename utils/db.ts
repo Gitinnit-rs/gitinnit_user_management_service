@@ -134,12 +134,18 @@ export const deleteData = async (tableName: string, matchQuery: object) => {
 
 export const createBucket = async (bucketAddress: string) => {
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
-  let { data, error } = await supabase.storage.getBucket("avatars");
+  let bucket = bucketAddress.split("/")[0];
+  let folder = bucketAddress.split("/")[1];
+  let { data, error } = await supabase.storage.from(bucket).list("folder", {
+    search: folder,
+  });
+
   if (error) {
     let { data, error } = await supabase.storage.createBucket(bucketAddress, {
       public: true,
     });
     if (error) {
+      console.log(error);
       return false;
     } else {
       return data;

@@ -30,16 +30,15 @@ router.post("/", upload.array("files", 5), async (req, res) => {
   file: multipart file with buffer
   */
   const { meta, artists } = req.body;
-  if (!req.files) {
+  if (req.files.length === 0) {
     res.status(400).send("No music file found");
     return;
   } else {
     const musicFile = (req.files as Express.Multer.File[])[0];
     const obj = await addMusicFile(musicFile, meta, artists);
     res.status(obj.status).send(obj.data);
-
-    // res.send("0");
   }
+  res.send("0");
 });
 
 // GET MUSIC BY ID
@@ -78,9 +77,15 @@ router.patch("/dislike/:id", async (req, res) => {
 });
 
 // CREATE ALBUM
-router.post("/album", async (req, res) => {
-  const album = req.body;
-  const obj = await createAlbum(album);
+router.post("/album", upload.array("files", 5), async (req, res) => {
+  if (req.files.length === 0) {
+    res.status(400).send("No cover file found");
+    return;
+  }
+  console.log(req.body, typeof req.body.album);
+  const { album } = req.body;
+  const coverFile = (req.files as Express.Multer.File[])[0];
+  const obj = await createAlbum(coverFile, JSON.parse(album));
   res.status(obj.status).send(obj.data);
 });
 

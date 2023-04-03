@@ -39,6 +39,9 @@ export const addMusicFile = async (
     `music/${artists[0]}`,
     music_file.data.path,
   );
+  if ("status" in publicUrl && publicUrl.status !== 200) {
+    return { status: 400, data: "Error while getting music file url" };
+  }
   const newMusicObj = { ...music_details, file: publicUrl.data.publicUrl };
   const music_obj = await insertRow("music", newMusicObj);
   if (music_obj.status !== 200) {
@@ -129,7 +132,32 @@ export const dislikeMusic = async (id: string) => {
 };
 
 // CREATE A NEW ALBUM
-export const createAlbum = async (album: Album) => {
+export const createAlbum = async (coverImage: any, album: Album) => {
+  const fileOptions = {
+    contentType: coverImage.mimetype,
+  };
+  const fileId: string = uuid();
+  const cover_image = await addToStorage(
+    `images/${album.owner_artist}`,
+    fileId,
+    coverImage.buffer,
+    fileOptions,
+  );
+
+  if (cover_image.status !== 200) {
+    return {
+      status: 400,
+      data: "Error while adding cover image file" + cover_image.data,
+    };
+  }
+  const publicUrl = await getPublicUrl(
+    `images/${album.owner_artist}`,
+    cover_image.data.path,
+  );
+  if ("status" in publicUrl && publicUrl.status !== 200) {
+    return { status: 400, data: "Error while getting music file url" };
+  }
+  album.cover = publicUrl.data.publicUrl;
   return await insertRow("album", album);
 };
 

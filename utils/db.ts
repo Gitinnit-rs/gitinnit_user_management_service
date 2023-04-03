@@ -134,8 +134,11 @@ export const deleteData = async (tableName: string, matchQuery: object) => {
 
 export const createBucket = async (bucketAddress: string) => {
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
-  let bucket = bucketAddress.split("/")[0];
-  let folder = bucketAddress.split("/")[1];
+  let bucket: string = bucketAddress.split("/")[0];
+  let folder: string = bucketAddress.split("/")[1];
+  if (!(bucket === "images" || bucket === "music")) {
+    return false;
+  }
   let { data, error } = await supabase.storage.from(bucket).list("folder", {
     search: folder,
   });
@@ -145,7 +148,6 @@ export const createBucket = async (bucketAddress: string) => {
       public: true,
     });
     if (error) {
-      console.log(error);
       return false;
     } else {
       return data;
@@ -172,9 +174,10 @@ export const addToStorage = async (
     data: null,
   };
   if (error) {
-    const errorMessage = error;
+    const errorMessage = error.message;
     obj.status = 400;
     obj.data = errorMessage;
+    console.log(errorMessage);
   } else {
     obj.data = data;
   }

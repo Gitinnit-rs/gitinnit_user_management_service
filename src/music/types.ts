@@ -12,7 +12,7 @@ export type MusicMapping = {
 export type Album = {
   name: string;
   desc: string | null;
-  cover: string;
+  cover?: string;
   owner_artist: string;
   release_date: string | null;
 };

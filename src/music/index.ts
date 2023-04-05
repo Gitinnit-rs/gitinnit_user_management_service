@@ -129,7 +129,7 @@ router.post("/remove_from_album", async (req, res) => {
 });
 
 // TODO:
-// REMOVE LIKE/DISLIKE
+// REMOVE LIKE/DISLIKE (REMOVE INTERACTION)
 // UPDATE MUSIC
 // DELETE MUSIC
 

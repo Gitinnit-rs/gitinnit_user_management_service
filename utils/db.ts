@@ -34,6 +34,7 @@ export const getData = async ({
   }
   return obj;
 };
+
 export const getSimilarData = async ({
   tableName,
   selectQuery = null,
@@ -112,12 +113,16 @@ export const updateData = async ({
   return obj;
 };
 
-export const deleteData = async (tableName: string, matchQuery: object) => {
+export const deleteData = async ({
+  tableName,
+  matchQuery = null,
+}: searchParameters) => {
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
-  let { data, error } = await supabase
-    .from(tableName)
-    .delete()
-    .match(matchQuery);
+  let query = supabase.from(tableName).delete();
+  if (matchQuery !== null) {
+    query.match(matchQuery);
+  }
+  let { data, error } = await query;
   let obj: returnObject = {
     status: 200,
     data: null,
@@ -155,6 +160,7 @@ export const createBucket = async (bucketAddress: string) => {
   }
   return data;
 };
+
 export const addToStorage = async (
   bucketAddress: string,
   name: string,
@@ -221,6 +227,7 @@ export const downloadStorageObject = async (
   }
   return obj;
 };
+
 export const deleteStorageObject = async (
   bucketAddress: string,
   name: string,

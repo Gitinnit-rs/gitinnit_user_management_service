@@ -1,7 +1,14 @@
 import express from "express";
 import dotenv from "dotenv";
 
-import { createPost, getPostById, getPostByUser } from "./utils";
+import {
+  createPost,
+  getPostById,
+  getPostByUser,
+  createComment,
+  likePost,
+  dislikePost,
+} from "./utils";
 
 dotenv.config();
 
@@ -28,10 +35,28 @@ router.get("/user/:id", async (req, res) => {
   res.status(obj.status).send(obj.data);
 });
 
+// Comment on a post
+router.post("/comment", async (req, res) => {
+  const comment = req.body;
+  const obj = await createComment(comment);
+  res.status(obj.status).send(obj.data);
+});
+
+// like a post
+router.post("/like", async (req, res) => {
+  const { user_id, post_id } = req.body;
+  const obj = await likePost(user_id, post_id);
+  res.status(obj.status).send(obj.data);
+});
+// dislike a post
+router.post("/dislike", async (req, res) => {
+  const { user_id, post_id } = req.body;
+  const obj = await dislikePost(user_id, post_id);
+  res.status(obj.status).send(obj.data);
+});
+// remove like/dislike
+
+// TODO:
 // UPDATE post details
 // Delete post
-// Comment on a post
-// like a post
-// dislike a post
-// remove like/dislike
 export default router;

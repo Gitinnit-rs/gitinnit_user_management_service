@@ -148,7 +148,7 @@ export const removeInteraction = async (user_id: string, post_id: string) => {
       newLikesCount = getObj.data[0].likes_count + 1;
     }
     if (newLikesCount === -1) {
-      return { status: 400, data: "Failed to remove interaction" };
+      return { status: 400, data: "Failed to update interaction" };
     }
     const updateQuery = {
       tableName: "post",
@@ -161,4 +161,5 @@ export const removeInteraction = async (user_id: string, post_id: string) => {
     };
     return await updateData(updateQuery);
   }
+  return { status: 400, data: "No interaction found" };
 };

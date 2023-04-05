@@ -8,6 +8,7 @@ import {
   createComment,
   likePost,
   dislikePost,
+  removeInteraction,
 } from "./utils";
 
 dotenv.config();
@@ -54,7 +55,13 @@ router.post("/dislike", async (req, res) => {
   const obj = await dislikePost(user_id, post_id);
   res.status(obj.status).send(obj.data);
 });
+
 // remove like/dislike
+router.post("/remove_interaction", async (req, res) => {
+  const { user_id, post_id } = req.body;
+  const obj = await removeInteraction(user_id, post_id);
+  res.status(obj.status).send(obj.data);
+});
 
 // TODO:
 // UPDATE post details

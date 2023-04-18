@@ -60,7 +60,6 @@ router.get("/followers", async (req, res) => {
 // UPDATE USER
 router.patch("/", async (req, res) => {
   const { id, user } = req.body;
-  console.log(id, user);
   const data = await updateUser(id, user);
   res.status(data.status).send(data.data);
 });

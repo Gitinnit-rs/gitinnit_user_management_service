@@ -44,7 +44,11 @@ export const updateUser = async (id: string, user: User) => {
 // DELETE A USER
 export const deleteUser = async (id: string) => {
   let matchQuery = { id: id };
-  return await deleteData("user", matchQuery);
+  let query = {
+    tableName: "user",
+    matchQuery: matchQuery,
+  };
+  return await deleteData(query);
 };
 
 // FOLLOW USER
@@ -65,8 +69,12 @@ export const unfollowUser = async (
     follower_id: follower_id,
     following_id: following_id,
   };
+  let query = {
+    tableName: "follow",
+    matchQuery: matchQuery,
+  };
 
-  return await deleteData("follow", matchQuery);
+  return await deleteData(query);
 };
 
 // GET FOLLOWERS OF A USER

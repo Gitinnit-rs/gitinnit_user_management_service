@@ -57,7 +57,7 @@ router.post("/dislike", async (req, res) => {
 });
 
 // remove like/dislike
-router.post("/remove_interaction", async (req, res) => {
+router.delete("/remove_interaction", async (req, res) => {
   const { user_id, post_id } = req.body;
   const obj = await removeInteraction(user_id, post_id);
   res.status(obj.status).send(obj.data);

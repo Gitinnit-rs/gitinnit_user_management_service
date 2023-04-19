@@ -30,7 +30,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // GET SPECIFIC USER BY NAME
-router.get("/:name", async (req, res) => {
+router.get("/name/:name", async (req, res) => {
   const { name } = req.params;
   const obj = await getUserByName(name);
   res.status(obj.status).send(obj.data);

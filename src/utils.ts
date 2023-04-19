@@ -12,7 +12,10 @@ export const searchByName = async (name: string) => {
   };
 
   let users = await getSimilarData(query);
-  obj.data = obj.data.concat(users.data);
+  if (users.data.length > 0) {
+    users.data.forEach(user => (user.type = "user"));
+    obj.data = obj.data.concat(users.data);
+  }
 
   query = {
     tableName: "music",
@@ -20,7 +23,10 @@ export const searchByName = async (name: string) => {
     likeQuery: "%" + name + "%",
   };
   let musics = await getSimilarData(query);
-  obj.data = obj.data.concat(musics.data);
+  if (musics.data.length > 0) {
+    musics.data.forEach(music => (music.type = "music"));
+    obj.data = obj.data.concat(musics.data);
+  }
 
   query = {
     tableName: "album",
@@ -28,7 +34,10 @@ export const searchByName = async (name: string) => {
     likeQuery: "%" + name + "%",
   };
   let albums = await getSimilarData(query);
-  obj.data = obj.data.concat(albums.data);
+  if (albums.data.length > 0) {
+    albums.data.forEach(album => (album.type = "album"));
+    obj.data = obj.data.concat(albums.data);
+  }
 
   return obj;
 };

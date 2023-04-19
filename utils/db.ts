@@ -183,7 +183,6 @@ export const addToStorage = async (
     const errorMessage = error.message;
     obj.status = 400;
     obj.data = errorMessage;
-    console.log(errorMessage);
   } else {
     obj.data = data;
   }

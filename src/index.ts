@@ -4,6 +4,7 @@ import music from "./music";
 import post from "./post";
 import dotenv from "dotenv";
 dotenv.config();
+import { searchByName } from "./utils";
 
 const PORT = process.env.PORT;
 
@@ -16,6 +17,13 @@ app.use("/post", post);
 
 app.get("/", async (req, res) => {
   res.send("HOME");
+});
+
+app.get("/search/:name", async (req, res) => {
+  const { name } = req.params;
+  const obj = await searchByName(name);
+  res.status(obj.status).send(obj.data);
+  return;
 });
 
 app.listen(PORT, () => {

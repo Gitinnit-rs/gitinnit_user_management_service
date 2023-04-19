@@ -1,13 +1,4 @@
-import {
-  getData,
-  insertRow,
-  updateData,
-  deleteData,
-  addToStorage,
-  getPublicUrl,
-  getSimilarData,
-} from "../../utils/db";
-import { v4 as uuid } from "uuid";
+import { getData, insertRow, updateData, deleteData } from "../../utils/db";
 
 import { Post, Like, Comment } from "./types";
 

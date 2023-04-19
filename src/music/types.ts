@@ -4,6 +4,12 @@ export type Music = {
   like_count: number | null;
 };
 
+export type MusicMetaData = {
+  name: string;
+  owner_artist: string;
+  release_date: Date;
+};
+
 export type MusicMapping = {
   artist_id: string;
   music_id: string;
@@ -14,7 +20,7 @@ export type Album = {
   desc: string | null;
   cover?: string;
   owner_artist: string;
-  release_date: string | null;
+  release_date: Date | null;
 };
 
 export type AlbumMapping = {

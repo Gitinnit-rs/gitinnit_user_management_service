@@ -41,38 +41,16 @@ router.post("/", upload.array("files", 5), async (req, res) => {
   res.send("0");
 });
 
-// GET MUSIC BY ID
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-  const obj = await getMusic(id);
+// GET MUSIC
+router.get("", async (req, res) => {
+  const searchQuery = req.query;
+  const obj = await getMusic(searchQuery);
   res.status(obj.status).send(obj.data);
 });
-
-// GET MUSIC BY ARTIST
-router.get("/user/:user_id", async (req, res) => {
-  const { user_id } = req.params;
-  const obj = await getMusicByUser(user_id);
-  res.status(obj.status).send(obj.data);
-});
-
-// GET MUSIC BY Name
+// GET MUSIC
 router.get("/name/:name", async (req, res) => {
   const { name } = req.params;
   const obj = await getMusicByName(name);
-  res.status(obj.status).send(obj.data);
-});
-
-// LIKE MUSIC
-router.patch("/like/:id", async (req, res) => {
-  const { id } = req.params;
-  const obj = await likeMusic(id);
-  res.status(obj.status).send(obj.data);
-});
-
-// DISLIKE MUSIC
-router.patch("/dislike/:id", async (req, res) => {
-  const { id } = req.params;
-  const obj = await dislikeMusic(id);
   res.status(obj.status).send(obj.data);
 });
 
@@ -82,24 +60,16 @@ router.post("/album", upload.array("files", 5), async (req, res) => {
     res.status(400).send("No cover file found");
     return;
   }
-  console.log(req.body, typeof req.body.album);
   const { album } = req.body;
   const coverFile = (req.files as Express.Multer.File[])[0];
-  const obj = await createAlbum(coverFile, JSON.parse(album));
+  const obj = await createAlbum(coverFile, album);
   res.status(obj.status).send(obj.data);
 });
 
 // GET ALBUM BY ID
-router.get("/album/:id", async (req, res) => {
-  const { id } = req.params;
-  const obj = await getAlbum(id);
-  res.status(obj.status).send(obj.data);
-});
-
-// GET ALBUM BY ID
-router.get("/album/user/:id", async (req, res) => {
-  const { id } = req.params;
-  const obj = await getAlbumByArtist(id);
+router.get("/album", async (req, res) => {
+  const searchQuery = req.query;
+  const obj = await getAlbum(searchQuery);
   res.status(obj.status).send(obj.data);
 });
 
@@ -111,25 +81,24 @@ router.get("/album/name/:name", async (req, res) => {
 });
 
 // ADD MUSIC TO ALBUM
-router.post("/add_to_album", async (req, res) => {
+router.post("/mapping/", async (req, res) => {
   // albumId is the id of albums type: string
   // musics is a list of music ids type: string[]
-  const { albumId, musics } = req.body;
-  const obj = await addMusicAlbumMapping(albumId, musics);
+  const { user_id, albumId, musics } = req.body;
+  const obj = await addMusicAlbumMapping(user_id, albumId, musics);
   res.status(obj.status).send(obj.data);
 });
 
 // REMOVE MUSIC FROM ALBUM
-router.post("/remove_from_album", async (req, res) => {
+router.post("/delete_mapping/", async (req, res) => {
   // albumId is the id of albums type: string
   // musics is a list of music ids type: string[]
-  const { albumId, musics } = req.body;
-  const obj = await removeMusicAlbumMapping(albumId, musics);
+  const { user_id, albumId, musics } = req.body;
+  const obj = await removeMusicAlbumMapping(user_id, albumId, musics);
   res.status(obj.status).send(obj.data);
 });
 
 // TODO:
-// REMOVE LIKE/DISLIKE (REMOVE INTERACTION)
 // UPDATE MUSIC
 // DELETE MUSIC
 

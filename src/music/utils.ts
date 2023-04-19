@@ -9,24 +9,28 @@ import {
 } from "../../utils/db";
 import { v4 as uuid } from "uuid";
 
-import { Album, Music, MusicMapping, AlbumMapping } from "./types";
+import {
+  Album,
+  Music,
+  MusicMetaData,
+  MusicMapping,
+  AlbumMapping,
+} from "./types";
 
 // CREATE A MUSIC ROW
 export const addMusicFile = async (
   musicFile: any,
-  meta: string,
-  artists_raw: string,
+  meta: MusicMetaData,
+  artists: string[],
 ) => {
-  let music_details = JSON.parse(meta);
-  music_details.release_date = new Date();
-  const artists = artists_raw.split(",");
+  meta.release_date = new Date();
   const fileId: string = uuid();
 
   const fileOptions = {
     contentType: musicFile.mimetype,
   };
   const music_file = await addToStorage(
-    `music/${artists[0]}`,
+    `music/${meta.owner_artist}`,
     fileId,
     musicFile.buffer,
     fileOptions,
@@ -36,13 +40,13 @@ export const addMusicFile = async (
     return { status: 400, data: "Error while adding music file" };
   }
   const publicUrl = await getPublicUrl(
-    `music/${artists[0]}`,
+    `music/${meta.owner_artist}`,
     music_file.data.path,
   );
   if ("status" in publicUrl && publicUrl.status !== 200) {
     return { status: 400, data: "Error while getting music file url" };
   }
-  const newMusicObj = { ...music_details, file: publicUrl.data.publicUrl };
+  const newMusicObj = { ...meta, file: publicUrl.data.publicUrl };
   const music_obj = await insertRow("music", newMusicObj);
   if (music_obj.status !== 200) {
     return { status: 400, data: "Error while adding music meta data" };
@@ -53,7 +57,7 @@ export const addMusicFile = async (
         music_id: music_obj.data[0].id,
         artist_id: artist,
       };
-      const obj = await addMusicArtistMapping(music_mapping);
+      const obj = await insertRow("music_mapping", music_mapping);
       return obj.status === 200;
     }),
   );
@@ -68,25 +72,11 @@ export const addMusicFile = async (
   }
 };
 
-// Add artist-music mapping
-export const addMusicArtistMapping = async (music_mapping: MusicMapping) => {
-  return await insertRow("music_mapping", music_mapping);
-};
-
 // GET MUSIC BY ID
-export const getMusic = async (id: string) => {
+export const getMusic = async (searchQuery: object) => {
   let query = {
     tableName: "music",
-    matchQuery: { id: id },
-  };
-  return await getData(query);
-};
-
-// GET MUSIC BY ARTIST
-export const getMusicByUser = async (id: string) => {
-  let query = {
-    tableName: "music_mapping",
-    matchQuery: { artist_id: id },
+    matchQuery: searchQuery,
   };
   return await getData(query);
 };
@@ -100,43 +90,13 @@ export const getMusicByName = async (name: string) => {
   return await getSimilarData(query);
 };
 
-// LIKE MUSIC
-export const likeMusic = async (id: string) => {
-  let query = {
-    tableName: "music",
-    matchQuery: { id: id },
-  };
-  let music_obj = await getData(query);
-  let updateDataQuery = {
-    tableName: "music",
-    matchQuery: { id: id },
-    updateQuery: { like_count: music_obj.data.like_count + 1 },
-  };
-  return updateData(updateDataQuery);
-};
-
-// DISLIKE MUSIC
-
-export const dislikeMusic = async (id: string) => {
-  let query = {
-    tableName: "music",
-    matchQuery: { id: id },
-  };
-  let music_obj = await getData(query);
-  let updateDataQuery = {
-    tableName: "music",
-    matchQuery: { id: id },
-    updateQuery: { like_count: music_obj.data.like_count - 1 },
-  };
-  return updateData(updateDataQuery);
-};
-
 // CREATE A NEW ALBUM
 export const createAlbum = async (coverImage: any, album: Album) => {
   const fileOptions = {
     contentType: coverImage.mimetype,
   };
   const fileId: string = uuid();
+  album.release_date = new Date();
   const cover_image = await addToStorage(
     `images/${album.owner_artist}`,
     fileId,
@@ -161,20 +121,11 @@ export const createAlbum = async (coverImage: any, album: Album) => {
   return await insertRow("album", album);
 };
 
-// GET AN ALBUM
-export const getAlbum = async (id: string) => {
-  const query = {
-    tableName: "album",
-    matchQuery: { id: id },
-  };
-  return await getData(query);
-};
-
-// GET ALBUMS BY ARTIST
-export const getAlbumByArtist = async (id: string) => {
+// GET Album
+export const getAlbum = async (searchQuery: object) => {
   let query = {
-    tableName: "albums",
-    matchQuery: { owner_artist: id },
+    tableName: "album",
+    matchQuery: searchQuery,
   };
   return await getData(query);
 };
@@ -190,9 +141,21 @@ export const getAlbumByName = async (name: string) => {
 
 // ADD MUSIC TO ALBUM
 export const addMusicAlbumMapping = async (
+  user_id: string,
   album_id: string,
   musics: string[],
 ) => {
+  const getQuery = {
+    tableName: "album",
+    matchQuery: { album_id: album_id },
+  };
+  const album = await getData(getQuery);
+  if (album.data.owner_artist !== user_id) {
+    return {
+      data: "Not the owner of the album",
+      status: 400,
+    };
+  }
   var obj: boolean[] = await Promise.all(
     musics.map(async (music): Promise<boolean> => {
       const album_mapping: AlbumMapping = {
@@ -215,16 +178,32 @@ export const addMusicAlbumMapping = async (
 };
 
 export const removeMusicAlbumMapping = async (
+  user_id: string,
   album_id: string,
   musics: string[],
 ) => {
+  const getQuery = {
+    tableName: "album",
+    matchQuery: { album_id: album_id },
+  };
+  const album = await getData(getQuery);
+  if (album.data.owner_artist !== user_id) {
+    return {
+      data: "Not the owner of the album",
+      status: 400,
+    };
+  }
   var obj: boolean[] = await Promise.all(
     musics.map(async (music): Promise<boolean> => {
       const album_mapping: AlbumMapping = {
         album_id: album_id,
         music_id: music,
       };
-      const obj = await deleteData("album_mapping", album_mapping);
+      const deleteQuery = {
+        tableName: "album_mapping",
+        matchQuery: album_mapping,
+      };
+      const obj = await deleteData(deleteQuery);
       return obj.status === 200;
     }),
   );

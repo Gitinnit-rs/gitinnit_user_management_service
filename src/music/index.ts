@@ -38,7 +38,6 @@ router.post("/", upload.array("files", 5), async (req, res) => {
     const obj = await addMusicFile(musicFile, meta, artists);
     res.status(obj.status).send(obj.data);
   }
-  res.send("0");
 });
 
 // GET MUSIC

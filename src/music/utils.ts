@@ -74,17 +74,43 @@ export const addMusicFile = async (
 
 // GET MUSIC BY ID
 export const getMusic = async (searchQuery: object) => {
-  let query = {
+  const query = {
     tableName: "music",
     matchQuery: searchQuery,
   };
-  return await getData(query);
+  let musics = await getData(query);
+  await Promise.all(
+    musics.data.map(async (music: any) => {
+      const newQuery = {
+        tableName: "music_mapping",
+        selectQuery: "artist_id",
+        matchQuery: { music_id: music.id },
+      };
+      let artists = await getData(newQuery);
+      music.artists = await Promise.all(
+        artists.data.map(async (artist: any) => {
+          const anotherQuery = {
+            tableName: "user",
+            selectQuery: "name, id",
+            matchQuery: { id: artist.artist_id },
+          };
+          let name = await getData(anotherQuery);
+          if (name.data.length > 0) {
+            return name.data[0];
+          }
+          return name;
+        }),
+      );
+    }),
+  );
+  return musics;
 };
 
 // GET MUSIC BY NAME
 export const getMusicByName = async (name: string) => {
   let query = {
     tableName: "music",
+    selectQuery: "name, id",
     likeQuery: "%" + name + "%",
   };
   return await getSimilarData(query);

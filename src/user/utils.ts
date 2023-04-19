@@ -25,6 +25,7 @@ export const getUser = async (id: string) => {
 export const getUserByName = async (name: string) => {
   let query = {
     tableName: "user",
+    selectQuery: "name, id",
     likeQuery: "%" + name + "%",
   };
   return await getSimilarData(query);

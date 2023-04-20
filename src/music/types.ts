@@ -1,12 +1,17 @@
 export type Music = {
   name: string;
-  release_date: string | null;
-  like_count: number | null;
+  owner_id: string;
+  release_date: Date;
+  like_count: number;
+  music_file: string;
+  cover_image: string;
+  tags: string[] | null;
+  genre: string[] | null;
 };
 
 export type MusicMetaData = {
   name: string;
-  owner_artist: string;
+  owner_id: string;
   release_date: Date;
 };
 
@@ -19,7 +24,7 @@ export type Album = {
   name: string;
   desc: string | null;
   cover?: string;
-  owner_artist: string;
+  owner_id: string;
   release_date: Date | null;
 };
 

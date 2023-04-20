@@ -5,14 +5,10 @@ import multer from "multer";
 import {
   getAlbum,
   getMusic,
-  likeMusic,
   createAlbum,
-  dislikeMusic,
   addMusicFile,
   getAlbumByName,
   getMusicByName,
-  getMusicByUser,
-  getAlbumByArtist,
   addMusicAlbumMapping,
   removeMusicAlbumMapping,
 } from "./utils";
@@ -29,13 +25,38 @@ router.post("/", upload.array("files", 5), async (req, res) => {
   artists: comma separated uuids of users
   file: multipart file with buffer
   */
-  const { meta, artists } = req.body;
+  if (!req.files) {
+    res.status(400).send("NO FILE FOUND");
+    return;
+  }
   if (req.files.length === 0) {
     res.status(400).send("No music file found");
     return;
   } else {
-    const musicFile = (req.files as Express.Multer.File[])[0];
-    const obj = await addMusicFile(musicFile, meta, artists);
+    let musicFile;
+    let imageFile;
+    await Promise.all(
+      req.files.map(file => {
+        if (file.mimetype.includes("image")) {
+          imageFile = file;
+        } else if (file.mimetype.includes("audio")) {
+          musicFile = file;
+        } else {
+          res.status(400).send("Invalid file type:" + file.mimetype);
+          return;
+        }
+      }),
+    );
+    const { name, owner_id, tags, genre, artists } = req.body;
+    const obj = await addMusicFile(
+      musicFile,
+      imageFile,
+      name,
+      owner_id,
+      tags,
+      genre,
+      artists,
+    );
     res.status(obj.status).send(obj.data);
   }
 });

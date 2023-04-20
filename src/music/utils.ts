@@ -17,42 +17,91 @@ import {
   AlbumMapping,
 } from "./types";
 
+const addFileToStorage = async (
+  type: string,
+  fileId: string,
+  file: any,
+  owner_id: string,
+) => {
+  if (type !== "music" && type !== "images") {
+    return { status: 400, data: "Error while adding music file" };
+  }
+  const fileOptions = {
+    contentType: file.mimetype,
+  };
+  const file_obj = await addToStorage(
+    `${type}/${owner_id}`,
+    fileId,
+    file.buffer,
+    fileOptions,
+  );
+  if (file_obj.status !== 200) {
+    return { status: 400, data: `Error while adding ${type} file` };
+  }
+  const publicUrl = await getPublicUrl(
+    `${type}/${owner_id}`,
+    file_obj.data.path,
+  );
+  if ("status" in publicUrl && publicUrl.status !== 200) {
+    return { status: 400, data: `Error while getting ${type} file url` };
+  }
+  return { status: 200, data: publicUrl.data.publicUrl };
+};
+
 // CREATE A MUSIC ROW
 export const addMusicFile = async (
   musicFile: any,
-  meta: MusicMetaData,
-  artists: string[],
+  coverImage: any,
+  name: string,
+  owner_id: string,
+  tags: string[],
+  genre: string[],
+  artists: string,
 ) => {
-  meta.release_date = new Date();
+  let release_date = new Date();
   const fileId: string = uuid();
-
-  const fileOptions = {
-    contentType: musicFile.mimetype,
-  };
-  const music_file = await addToStorage(
-    `music/${meta.owner_artist}`,
+  console.log("ADDING MUSIC FILE");
+  const music_url = await addFileToStorage(
+    "music",
     fileId,
-    musicFile.buffer,
-    fileOptions,
+    musicFile,
+    owner_id,
   );
 
-  if (music_file.status !== 200) {
-    return { status: 400, data: "Error while adding music file" };
+  if (music_url.status == 400) {
+    return music_url;
   }
-  const publicUrl = await getPublicUrl(
-    `music/${meta.owner_artist}`,
-    music_file.data.path,
+
+  console.log("ADDING IMAGE FILE");
+  const cover_url = await addFileToStorage(
+    "images",
+    fileId,
+    coverImage,
+    owner_id,
   );
-  if ("status" in publicUrl && publicUrl.status !== 200) {
-    return { status: 400, data: "Error while getting music file url" };
+  if (cover_url.status == 400) {
+    return cover_url;
   }
-  const newMusicObj = { ...meta, file: publicUrl.data.publicUrl };
+
+  const newMusicObj: Music = {
+    name,
+    owner_id,
+    release_date,
+    tags: JSON.parse(tags),
+    genre: JSON.parse(genre),
+    music_url: music_url.data,
+    cover_url: cover_url.data,
+  };
+
+  console.log("ADDING MUSIC OBJ", newMusicObj);
+
   const music_obj = await insertRow("music", newMusicObj);
   if (music_obj.status !== 200) {
     return { status: 400, data: "Error while adding music meta data" };
   }
+
   var obj: boolean[] = await Promise.all(
-    artists.map(async (artist): Promise<boolean> => {
+    JSON.parse(artists).map(async (artist): Promise<boolean> => {
       const music_mapping: MusicMapping = {
         music_id: music_obj.data[0].id,
         artist_id: artist,
@@ -66,7 +115,7 @@ export const addMusicFile = async (
       return e === true;
     })
   ) {
-    return { status: 200, data: "SUCCESS" };
+    return { status: 200, data: { id: music_obj.data[0].id } };
   } else {
     return { status: 400, data: "Error while adding mapping" };
   }

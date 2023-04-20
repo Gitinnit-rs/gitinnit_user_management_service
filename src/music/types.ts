@@ -2,11 +2,11 @@ export type Music = {
   name: string;
   owner_id: string;
   release_date: Date;
-  like_count: number;
-  music_file: string;
-  cover_image: string;
+  music_url: string;
+  cover_url: string;
   tags: string[] | null;
   genre: string[] | null;
+  like_count?: number;
 };
 
 export type MusicMetaData = {
@@ -23,7 +23,7 @@ export type MusicMapping = {
 export type Album = {
   name: string;
   desc: string | null;
-  cover?: string;
+  cover_url?: string;
   owner_id: string;
   release_date: Date | null;
 };

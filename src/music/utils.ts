@@ -1,7 +1,6 @@
 import {
   getData,
   insertRow,
-  updateData,
   deleteData,
   addToStorage,
   getPublicUrl,
@@ -9,13 +8,7 @@ import {
 } from "../../utils/db";
 import { v4 as uuid } from "uuid";
 
-import {
-  Album,
-  Music,
-  MusicMetaData,
-  MusicMapping,
-  AlbumMapping,
-} from "./types";
+import { Album, Music, MusicMapping, AlbumMapping } from "./types";
 
 const addFileToStorage = async (
   type: string,
@@ -56,23 +49,20 @@ export const addMusicFile = async (
   owner_id: string,
   tags: string[],
   genre: string[],
-  artists: string,
+  artists: string[],
 ) => {
   let release_date = new Date();
   const fileId: string = uuid();
-  console.log("ADDING MUSIC FILE");
   const music_url = await addFileToStorage(
     "music",
     fileId,
     musicFile,
     owner_id,
   );
-
   if (music_url.status == 400) {
     return music_url;
   }
 
-  console.log("ADDING IMAGE FILE");
   const cover_url = await addFileToStorage(
     "images",
     fileId,
@@ -87,13 +77,12 @@ export const addMusicFile = async (
     name,
     owner_id,
     release_date,
-    tags: JSON.parse(tags),
-    genre: JSON.parse(genre),
+    tags,
+    genre,
+    like_count: 0,
     music_url: music_url.data,
     cover_url: cover_url.data,
   };
-
-  console.log("ADDING MUSIC OBJ", newMusicObj);
 
   const music_obj = await insertRow("music", newMusicObj);
   if (music_obj.status !== 200) {
@@ -101,7 +90,7 @@ export const addMusicFile = async (
   }
 
   var obj: boolean[] = await Promise.all(
-    JSON.parse(artists).map(async (artist): Promise<boolean> => {
+    artists.map(async (artist): Promise<boolean> => {
       const music_mapping: MusicMapping = {
         music_id: music_obj.data[0].id,
         artist_id: artist,
@@ -167,32 +156,19 @@ export const getMusicByName = async (name: string) => {
 
 // CREATE A NEW ALBUM
 export const createAlbum = async (coverImage: any, album: Album) => {
-  const fileOptions = {
-    contentType: coverImage.mimetype,
-  };
   const fileId: string = uuid();
-  album.release_date = new Date();
-  const cover_image = await addToStorage(
-    `images/${album.owner_artist}`,
+  const cover_url = await addFileToStorage(
+    "images",
     fileId,
-    coverImage.buffer,
-    fileOptions,
+    coverImage,
+    album.owner_id,
   );
+  if (cover_url.status == 400) {
+    return cover_url;
+  }
 
-  if (cover_image.status !== 200) {
-    return {
-      status: 400,
-      data: "Error while adding cover image file" + cover_image.data,
-    };
-  }
-  const publicUrl = await getPublicUrl(
-    `images/${album.owner_artist}`,
-    cover_image.data.path,
-  );
-  if ("status" in publicUrl && publicUrl.status !== 200) {
-    return { status: 400, data: "Error while getting music file url" };
-  }
-  album.cover = publicUrl.data.publicUrl;
+  album.release_date = new Date();
+  album.cover_url = cover_url.data;
   return await insertRow("album", album);
 };
 

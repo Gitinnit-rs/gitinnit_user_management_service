@@ -1,6 +1,6 @@
 export type Music = {
   name: string;
-  owner_id: string;
+  artist_id: string;
   release_date: Date;
   music_url: string;
   cover_url: string;
@@ -11,7 +11,7 @@ export type Music = {
 
 export type MusicMetaData = {
   name: string;
-  owner_id: string;
+  artist_id: string;
   release_date: Date;
 };
 
@@ -24,7 +24,7 @@ export type Album = {
   name: string;
   desc: string | null;
   cover_url?: string;
-  owner_id: string;
+  artist_id: string;
   release_date: Date | null;
 };
 

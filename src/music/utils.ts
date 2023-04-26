@@ -14,7 +14,7 @@ const addFileToStorage = async (
   type: string,
   fileId: string,
   file: any,
-  owner_id: string,
+  artist_id: string,
 ) => {
   if (type !== "music" && type !== "images") {
     return { status: 400, data: "Error while adding music file" };
@@ -23,7 +23,7 @@ const addFileToStorage = async (
     contentType: file.mimetype,
   };
   const file_obj = await addToStorage(
-    `${type}/${owner_id}`,
+    `${type}/${artist_id}`,
     fileId,
     file.buffer,
     fileOptions,
@@ -32,13 +32,16 @@ const addFileToStorage = async (
     return { status: 400, data: `Error while adding ${type} file` };
   }
   const publicUrl = await getPublicUrl(
-    `${type}/${owner_id}`,
+    `${type}/${artist_id}`,
     file_obj.data.path,
   );
   if ("status" in publicUrl && publicUrl.status !== 200) {
     return { status: 400, data: `Error while getting ${type} file url` };
   }
-  return { status: 200, data: publicUrl.data.publicUrl };
+  return {
+    status: 200,
+    data: (publicUrl.data as { publicUrl: string }).publicUrl,
+  };
 };
 
 // CREATE A MUSIC ROW
@@ -46,7 +49,7 @@ export const addMusicFile = async (
   musicFile: any,
   coverImage: any,
   name: string,
-  owner_id: string,
+  artist_id: string,
   tags: string[],
   genre: string[],
   artists: string[],
@@ -57,7 +60,7 @@ export const addMusicFile = async (
     "music",
     fileId,
     musicFile,
-    owner_id,
+    artist_id,
   );
   if (music_url.status == 400) {
     return music_url;
@@ -67,7 +70,7 @@ export const addMusicFile = async (
     "images",
     fileId,
     coverImage,
-    owner_id,
+    artist_id,
   );
   if (cover_url.status == 400) {
     return cover_url;
@@ -75,7 +78,7 @@ export const addMusicFile = async (
 
   const newMusicObj: Music = {
     name,
-    owner_id,
+    artist_id,
     release_date,
     tags,
     genre,
@@ -161,7 +164,7 @@ export const createAlbum = async (coverImage: any, album: Album) => {
     "images",
     fileId,
     coverImage,
-    album.owner_id,
+    album.artist_id,
   );
   if (cover_url.status == 400) {
     return cover_url;
@@ -192,7 +195,7 @@ export const getAlbumByName = async (name: string) => {
 
 // ADD MUSIC TO ALBUM
 export const addMusicAlbumMapping = async (
-  user_id: string,
+  artist_id: string,
   album_id: string,
   musics: string[],
 ) => {
@@ -201,7 +204,7 @@ export const addMusicAlbumMapping = async (
     matchQuery: { album_id: album_id },
   };
   const album = await getData(getQuery);
-  if (album.data.owner_artist !== user_id) {
+  if (album.data.owner_artist !== artist_id) {
     return {
       data: "Not the owner of the album",
       status: 400,
@@ -229,7 +232,7 @@ export const addMusicAlbumMapping = async (
 };
 
 export const removeMusicAlbumMapping = async (
-  user_id: string,
+  artist_id: string,
   album_id: string,
   musics: string[],
 ) => {
@@ -238,7 +241,7 @@ export const removeMusicAlbumMapping = async (
     matchQuery: { album_id: album_id },
   };
   const album = await getData(getQuery);
-  if (album.data.owner_artist !== user_id) {
+  if (album.data.owner_artist !== artist_id) {
     return {
       data: "Not the owner of the album",
       status: 400,

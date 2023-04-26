@@ -45,21 +45,21 @@ router.post("/comment", async (req, res) => {
 
 // like a post
 router.post("/like", async (req, res) => {
-  const { user_id, post_id } = req.body;
-  const obj = await likePost(user_id, post_id);
+  const { artist_id, post_id } = req.body;
+  const obj = await likePost(artist_id, post_id);
   res.status(obj.status).send(obj.data);
 });
 // dislike a post
 router.post("/dislike", async (req, res) => {
-  const { user_id, post_id } = req.body;
-  const obj = await dislikePost(user_id, post_id);
+  const { artist_id, post_id } = req.body;
+  const obj = await dislikePost(artist_id, post_id);
   res.status(obj.status).send(obj.data);
 });
 
 // remove like/dislike
 router.delete("/remove_interaction", async (req, res) => {
-  const { user_id, post_id } = req.body;
-  const obj = await removeInteraction(user_id, post_id);
+  const { artist_id, post_id } = req.body;
+  const obj = await removeInteraction(artist_id, post_id);
   res.status(obj.status).send(obj.data);
 });
 

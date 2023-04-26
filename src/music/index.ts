@@ -36,6 +36,7 @@ router.post("/", upload.array("files", 5), async (req, res) => {
     let musicFile;
     let imageFile;
     await Promise.all(
+      // @ts-ignore
       req.files.map(file => {
         if (file.mimetype.includes("image")) {
           imageFile = file;
@@ -47,12 +48,12 @@ router.post("/", upload.array("files", 5), async (req, res) => {
         }
       }),
     );
-    const { name, owner_id, tags, genre, artists } = req.body;
+    const { name, artist_id, tags, genre, artists } = req.body;
     const obj = await addMusicFile(
       musicFile,
       imageFile,
       name,
-      owner_id,
+      artist_id,
       tags,
       genre,
       artists,
@@ -76,6 +77,7 @@ router.get("/name/:name", async (req, res) => {
 
 // CREATE ALBUM
 router.post("/album", upload.array("files", 5), async (req, res) => {
+  // @ts-ignore
   if (req.files.length === 0) {
     res.status(400).send("No cover file found");
     return;
@@ -104,8 +106,8 @@ router.get("/album/name/:name", async (req, res) => {
 router.post("/mapping/", async (req, res) => {
   // albumId is the id of albums type: string
   // musics is a list of music ids type: string[]
-  const { user_id, albumId, musics } = req.body;
-  const obj = await addMusicAlbumMapping(user_id, albumId, musics);
+  const { artist_id, albumId, musics } = req.body;
+  const obj = await addMusicAlbumMapping(artist_id, albumId, musics);
   res.status(obj.status).send(obj.data);
 });
 
@@ -113,8 +115,8 @@ router.post("/mapping/", async (req, res) => {
 router.post("/delete_mapping/", async (req, res) => {
   // albumId is the id of albums type: string
   // musics is a list of music ids type: string[]
-  const { user_id, albumId, musics } = req.body;
-  const obj = await removeMusicAlbumMapping(user_id, albumId, musics);
+  const { artist_id, albumId, musics } = req.body;
+  const obj = await removeMusicAlbumMapping(artist_id, albumId, musics);
   res.status(obj.status).send(obj.data);
 });
 

@@ -23,7 +23,7 @@ export const getPostByUser = async (id: string) => {
   const query = {
     tableName: "post",
     matchQuery: {
-      user_id: id,
+      artist_id: id,
     },
   };
   return await getData(query);
@@ -35,10 +35,10 @@ export const createComment = async (comment: Comment) => {
 };
 
 // LIKE A POST
-export const likePost = async (user_id: string, post_id: string) => {
-  await removeInteraction(user_id, post_id);
+export const likePost = async (artist_id: string, post_id: string) => {
+  await removeInteraction(artist_id, post_id);
   const likeObj: Like = {
-    user_id: user_id,
+    artist_id: artist_id,
     post_id: post_id,
     like: true,
   };
@@ -69,10 +69,10 @@ export const likePost = async (user_id: string, post_id: string) => {
 };
 
 // DISLIKE A POST
-export const dislikePost = async (user_id: string, post_id: string) => {
-  await removeInteraction(user_id, post_id);
+export const dislikePost = async (artist_id: string, post_id: string) => {
+  await removeInteraction(artist_id, post_id);
   const likeObj: Like = {
-    user_id: user_id,
+    artist_id: artist_id,
     post_id: post_id,
     like: false,
   };
@@ -103,12 +103,12 @@ export const dislikePost = async (user_id: string, post_id: string) => {
 };
 
 // REMOVE INTERACTION WITH POST
-export const removeInteraction = async (user_id: string, post_id: string) => {
+export const removeInteraction = async (artist_id: string, post_id: string) => {
   const getQuery = {
     tableName: "likes",
     matchQuery: {
       post_id: post_id,
-      user_id: user_id,
+      artist_id: artist_id,
     },
   };
   let obj = await getData(getQuery);
@@ -118,7 +118,7 @@ export const removeInteraction = async (user_id: string, post_id: string) => {
       tableName: "likes",
       matchQuery: {
         post_id: post_id,
-        user_id: user_id,
+        artist_id: artist_id,
       },
     };
     let deleteObj = await deleteData(deleteQuery);

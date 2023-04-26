@@ -1,4 +1,8 @@
 import { getSimilarData } from "../utils/db";
+import { Album, Music } from "./music/types";
+import { User } from "./user/types";
+
+type DataWithType<T> = Partial<T> & { type: string };
 
 export const searchByName = async (name: string) => {
   const obj = {
@@ -13,7 +17,7 @@ export const searchByName = async (name: string) => {
 
   let users = await getSimilarData(query);
   if (users.data.length > 0) {
-    users.data.forEach(user => (user.type = "user"));
+    users.data.forEach((user: DataWithType<User>) => (user.type = "user"));
     obj.data = obj.data.concat(users.data);
   }
 
@@ -24,7 +28,7 @@ export const searchByName = async (name: string) => {
   };
   let musics = await getSimilarData(query);
   if (musics.data.length > 0) {
-    musics.data.forEach(music => (music.type = "music"));
+    musics.data.forEach((music: DataWithType<Music>) => (music.type = "music"));
     obj.data = obj.data.concat(musics.data);
   }
 
@@ -35,7 +39,7 @@ export const searchByName = async (name: string) => {
   };
   let albums = await getSimilarData(query);
   if (albums.data.length > 0) {
-    albums.data.forEach(album => (album.type = "album"));
+    albums.data.forEach((album: DataWithType<Album>) => (album.type = "album"));
     obj.data = obj.data.concat(albums.data);
   }
 

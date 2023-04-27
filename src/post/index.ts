@@ -3,8 +3,7 @@ import dotenv from "dotenv";
 
 import {
   createPost,
-  getPostById,
-  getPostByUser,
+  getPost,
   createComment,
   likePost,
   dislikePost,
@@ -23,16 +22,9 @@ router.post("/", async (req, res) => {
 });
 
 // GET post by id
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-  const obj = await getPostById(id);
-  res.status(obj.status).send(obj.data);
-});
-
-// GET post by user id
-router.get("/user/:id", async (req, res) => {
-  const { id } = req.params;
-  const obj = await getPostByUser(id);
+router.get("", async (req, res) => {
+  const searchQuery = req.query;
+  const obj = await getPost(searchQuery);
   res.status(obj.status).send(obj.data);
 });
 

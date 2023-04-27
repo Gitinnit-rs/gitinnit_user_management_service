@@ -20,11 +20,6 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // CREATE MUSIC
 router.post("/", upload.array("files", 5), async (req, res) => {
-  /*
-  meta:{name, likes_count, etc}
-  artists: comma separated uuids of users
-  file: multipart file with buffer
-  */
   if (!req.files) {
     res.status(400).send("NO FILE FOUND");
     return;

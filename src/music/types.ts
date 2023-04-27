@@ -6,7 +6,6 @@ export type Music = {
   cover_url: string;
   tags: string[] | null;
   genre: string[] | null;
-  like_count?: number;
 };
 
 export type MusicMetaData = {

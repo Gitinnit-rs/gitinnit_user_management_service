@@ -8,25 +8,33 @@ export const createPost = async (post: Post) => {
 };
 
 // GET POST BY ID
-export const getPostById = async (id: string) => {
+export const getPost = async (matchQuery: object) => {
   const query = {
     tableName: "post",
-    matchQuery: {
-      id: id,
-    },
+    matchQuery: matchQuery,
   };
-  return await getData(query);
-};
-
-// GET POST BY USER ID
-export const getPostByUser = async (id: string) => {
-  const query = {
-    tableName: "post",
-    matchQuery: {
-      artist_id: id,
-    },
+  let post = await getData(query);
+  console.log(post.data);
+  if (
+    post.data[0].type !== "music" &&
+    post.data[0].type !== "album" &&
+    post.data[0].type === "image"
+  ) {
+    console.log(post.data[0].type === "music");
+    return {
+      status: 400,
+      data: "Something went wrong, invalid type for post:" + post.data[0].type,
+    };
+  }
+  let mediaQuery = {
+    tableName: post.data[0].type,
+    matchQuery: { id: post.data[0].content_id },
   };
-  return await getData(query);
+  let media = await getData(mediaQuery);
+  post.data[0].media = media.data[0];
+  delete post.data[0].type;
+  delete post.data[0].content_id;
+  return post;
 };
 
 // CREATE A COMMENT

@@ -32,7 +32,6 @@ export const getPost = async (matchQuery: object) => {
   };
   let media = await getData(mediaQuery);
   post.data[0].media = media.data[0];
-  delete post.data[0].type;
   delete post.data[0].content_id;
   return post;
 };

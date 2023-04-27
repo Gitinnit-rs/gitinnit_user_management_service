@@ -82,7 +82,6 @@ export const addMusicFile = async (
     release_date,
     tags,
     genre,
-    like_count: 0,
     music_url: music_url.data,
     cover_url: cover_url.data,
   };

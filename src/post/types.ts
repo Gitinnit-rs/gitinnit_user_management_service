@@ -1,9 +1,9 @@
 export type Post = {
   content_id: string;
   type: "music" | "album" | "image";
-  likes_count: number | null;
-  comment_count: number | null;
-  tags: string[] | null;
+  likes_count?: number | null;
+  comment_count?: number | null;
+  tags?: string[] | null;
   caption: string | null;
   artist_id: string;
 };

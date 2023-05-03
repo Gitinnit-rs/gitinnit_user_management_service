@@ -12,7 +12,7 @@ export type Comment = {
   artist_id: string;
   post_id: string;
   content: string;
-  likes_count: number | null;
+  likes_count?: number | null;
 };
 
 export type Like = {

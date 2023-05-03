@@ -46,7 +46,7 @@ export const getSimilarData = async ({
     query.select(selectQuery);
   }
   if (likeQuery !== null) {
-    query = query.like("name", likeQuery);
+    query = query.ilike("name", likeQuery);
   }
   let { data, error } = await query;
   let obj: returnObject = {

@@ -119,6 +119,9 @@ export const getMusic = async (searchQuery: object) => {
     matchQuery: searchQuery,
   };
   let musics = await getData(query);
+  if (musics.status !== 200) {
+    return musics;
+  }
   await Promise.all(
     musics.data.map(async (music: any) => {
       const newQuery = {
@@ -127,6 +130,9 @@ export const getMusic = async (searchQuery: object) => {
         matchQuery: { music_id: music.id },
       };
       let artists = await getData(newQuery);
+      if (artists.status !== 200) {
+        return artists;
+      }
       music.artists = await Promise.all(
         artists.data.map(async (artist: any) => {
           const anotherQuery = {
@@ -174,13 +180,41 @@ export const createAlbum = async (coverImage: any, album: Album) => {
   return await insertRow("album", album);
 };
 
+const getMusicForAlbum = async (album_id: string) => {
+  let query = {
+    tableName: "album_mapping",
+    selectQuery: "music_id",
+    matchQuery: { album_id: album_id },
+  };
+  let musics = await getData(query);
+  if (musics.status !== 200) {
+    return musics;
+  }
+  let returnObj = <any>{ status: 200, data: [] };
+  await Promise.all(
+    musics.data.map(async (music: { music_id: string }) => {
+      returnObj.data.push((await getMusic({ id: music.music_id })).data[0]);
+    }),
+  );
+  return returnObj;
+};
 // GET Album
 export const getAlbum = async (searchQuery: object) => {
   let query = {
     tableName: "album",
     matchQuery: searchQuery,
   };
-  return await getData(query);
+  let albums = await getData(query);
+  await Promise.all(
+    albums.data.map(async (album: any) => {
+      let musics = await getMusicForAlbum(album.id);
+      if (musics.status !== 200) {
+        return musics;
+      }
+      album.music = musics.data;
+    }),
+  );
+  return albums;
 };
 
 // GET ALBUM BY NAME

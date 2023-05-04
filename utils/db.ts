@@ -102,6 +102,7 @@ export const updateData = async ({
     obj.data = "NO MATCH QUERY PROVIDED";
     return obj;
   }
+  query.select();
   let { data, error } = await query;
   if (error) {
     const errorMessage = error;

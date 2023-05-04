@@ -14,7 +14,6 @@ export const getPost = async (matchQuery: object) => {
     matchQuery: matchQuery,
   };
   let post = await getData(query);
-  console.log(post.data);
   if (
     post.data[0].type !== "music" &&
     post.data[0].type !== "album" &&

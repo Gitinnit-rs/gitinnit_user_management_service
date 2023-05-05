@@ -19,7 +19,9 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 // CREATE MUSIC
-router.post("/", upload.array("files", 5), async (req, res) => {
+router.post("/", upload.any(), async (req, res) => {
+  console.log(req.files);
+  console.log(req.body);
   if (!req.files) {
     res.status(400).send("NO FILE FOUND");
     return;
@@ -32,7 +34,7 @@ router.post("/", upload.array("files", 5), async (req, res) => {
     let imageFile;
     await Promise.all(
       // @ts-ignore
-      req.files.map(file => {
+      req.files.map((file) => {
         if (file.mimetype.includes("image")) {
           imageFile = file;
         } else if (file.mimetype.includes("audio")) {
@@ -41,7 +43,7 @@ router.post("/", upload.array("files", 5), async (req, res) => {
           res.status(400).send("Invalid file type:" + file.mimetype);
           return;
         }
-      }),
+      })
     );
     const { name, artist_id, tags, genre, artists } = req.body;
     const obj = await addMusicFile(
@@ -51,7 +53,7 @@ router.post("/", upload.array("files", 5), async (req, res) => {
       artist_id,
       tags,
       genre,
-      artists,
+      artists
     );
     res.status(obj.status).send(obj.data);
   }

@@ -1,4 +1,5 @@
 import { getData, insertRow, updateData, deleteData } from "../../utils/db";
+import { getAlbum, getMusic } from "../music/utils";
 
 import { Post, Like, Comment } from "./types";
 
@@ -29,8 +30,16 @@ export const getPost = async (matchQuery: object) => {
     tableName: post.data[0].type,
     matchQuery: { id: post.data[0].content_id },
   };
-  let media = await getData(mediaQuery);
-  post.data[0].media = media.data[0];
+  if (post.data[0].type === "music") {
+    let media = await getMusic(mediaQuery);
+    post.data[0].media = media.data[0];
+  } else if (post.data[0].type === "album") {
+    let media = await getAlbum(mediaQuery);
+    post.data[0].media = media.data[0];
+  } else if (post.data[0].type === "image") {
+    let media = await getData(mediaQuery);
+    post.data[0].media = media.data[0];
+  }
   delete post.data[0].content_id;
   return post;
 };

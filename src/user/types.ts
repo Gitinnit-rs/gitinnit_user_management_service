@@ -4,4 +4,6 @@ export type User = {
   username: string | null;
   bio: string | null;
   profile_photo: string | null;
+  instagram: string | null;
+  soundcloud: string | null;
 };

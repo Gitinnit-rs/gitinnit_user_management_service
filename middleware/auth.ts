@@ -6,6 +6,7 @@ export const resolveAccessToken = async (req, res, next) => {
     delete req.artist_id;
   }
   if (!req.access_token) {
+    console.log("No access token found");
     res.status(400).send("No access token found");
     return;
   }

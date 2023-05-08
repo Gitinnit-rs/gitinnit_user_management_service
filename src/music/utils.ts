@@ -104,7 +104,7 @@ export const addMusicFile = async (
 
   var obj: boolean[] = await Promise.all(
     artists.map(async (artist): Promise<boolean> => {
-      if (artist.trim() === "") {
+      if (typeof artist === "string" && artist.trim() === "") {
         return true;
       }
       const music_mapping: MusicMapping = {

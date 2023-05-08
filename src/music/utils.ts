@@ -90,6 +90,9 @@ export const addMusicFile = async (
   if (music_obj.status !== 200) {
     return { status: 400, data: "Error while adding music meta data" };
   }
+  if (artists.length === 0) {
+    return music_obj;
+  }
 
   var obj: boolean[] = await Promise.all(
     artists.map(async (artist): Promise<boolean> => {

@@ -12,6 +12,7 @@ import {
   addMusicAlbumMapping,
   removeMusicAlbumMapping,
 } from "./utils";
+import { resolveAccessToken } from "../../middleware/auth";
 
 dotenv.config();
 
@@ -19,7 +20,7 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 // CREATE MUSIC
-router.post("/", upload.any(), async (req, res) => {
+router.post("/", upload.any(), resolveAccessToken, async (req, res) => {
   console.log(req.files);
   console.log(req.body);
   if (!req.files) {
@@ -34,7 +35,7 @@ router.post("/", upload.any(), async (req, res) => {
     let imageFile;
     await Promise.all(
       // @ts-ignore
-      req.files.map((file) => {
+      req.files.map(file => {
         if (file.mimetype.includes("image")) {
           imageFile = file;
         } else if (file.mimetype.includes("audio")) {
@@ -43,9 +44,10 @@ router.post("/", upload.any(), async (req, res) => {
           res.status(400).send("Invalid file type:" + file.mimetype);
           return;
         }
-      })
+      }),
     );
     const { name, artist_id, tags, genre, artists } = req.body;
+    console.log(req.body, musicFile, imageFile);
     const obj = await addMusicFile(
       musicFile,
       imageFile,
@@ -53,7 +55,7 @@ router.post("/", upload.any(), async (req, res) => {
       artist_id,
       tags,
       genre,
-      artists
+      artists,
     );
     res.status(obj.status).send(obj.data);
   }
@@ -73,17 +75,22 @@ router.get("/name/:name", async (req, res) => {
 });
 
 // CREATE ALBUM
-router.post("/album", upload.array("files", 5), async (req, res) => {
-  // @ts-ignore
-  if (req.files.length === 0) {
-    res.status(400).send("No cover file found");
-    return;
-  }
-  const { album } = req.body;
-  const coverFile = (req.files as Express.Multer.File[])[0];
-  const obj = await createAlbum(coverFile, album);
-  res.status(obj.status).send(obj.data);
-});
+router.post(
+  "/album",
+  upload.array("files", 5),
+  resolveAccessToken,
+  async (req, res) => {
+    // @ts-ignore
+    if (req.files.length === 0) {
+      res.status(400).send("No cover file found");
+      return;
+    }
+    const { album } = req.body;
+    const coverFile = (req.files as Express.Multer.File[])[0];
+    const obj = await createAlbum(coverFile, album);
+    res.status(obj.status).send(obj.data);
+  },
+);
 
 // GET ALBUM BY ID
 router.get("/album", async (req, res) => {
@@ -100,7 +107,7 @@ router.get("/album/name/:name", async (req, res) => {
 });
 
 // ADD MUSIC TO ALBUM
-router.post("/mapping/", async (req, res) => {
+router.post("/mapping/", resolveAccessToken, async (req, res) => {
   // albumId is the id of albums type: string
   // musics is a list of music ids type: string[]
   const { artist_id, albumId, musics } = req.body;
@@ -109,7 +116,7 @@ router.post("/mapping/", async (req, res) => {
 });
 
 // REMOVE MUSIC FROM ALBUM
-router.post("/delete_mapping/", async (req, res) => {
+router.post("/delete_mapping/", resolveAccessToken, async (req, res) => {
   // albumId is the id of albums type: string
   // musics is a list of music ids type: string[]
   const { artist_id, albumId, musics } = req.body;

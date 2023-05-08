@@ -10,13 +10,14 @@ import {
   getUserByName,
 } from "./utils";
 import { User } from "./types";
+import { resolveAccessToken } from "../../middleware/auth";
 
 dotenv.config();
 
 const router = express.Router();
 
 // CREATE USER
-router.post("/", async (req, res) => {
+router.post("/", resolveAccessToken, async (req, res) => {
   const user: User = req.body;
   const obj = await createUser(user);
   res.status(obj.status).send(obj.data);
@@ -37,15 +38,29 @@ router.get("/name/:name", async (req, res) => {
 });
 
 // FOLLOW A USER
-router.post("/follow", async (req, res) => {
+router.post("/follow", resolveAccessToken, async (req, res) => {
   const { follower_id, following_id } = req.body;
+  if (req.body.artist_id != following_id) {
+    res
+      .status(400)
+      .send(
+        `Mismatch between artist_id: ${req.body.artist_id} and following_id: ${following_id}`,
+      );
+  }
   const obj = await followUser(follower_id, following_id);
   res.status(obj.status).send(obj.data);
 });
 
 // UNFOLLOW A USER
-router.post("/unfollow", async (req, res) => {
+router.post("/unfollow", resolveAccessToken, async (req, res) => {
   const { follower_id, following_id } = req.body;
+  if (req.body.artist_id != following_id) {
+    res
+      .status(400)
+      .send(
+        `Mismatch between artist_id: ${req.body.artist_id} and following_id: ${following_id}`,
+      );
+  }
   const obj = await unfollowUser(follower_id, following_id);
   res.status(obj.status).send(obj.data);
 });
@@ -58,7 +73,7 @@ router.get("/followers", async (req, res) => {
 });
 
 // UPDATE USER
-router.patch("/", async (req, res) => {
+router.patch("/", resolveAccessToken, async (req, res) => {
   const { id, user } = req.body;
   const data = await updateUser(id, user);
   res.status(data.status).send(data.data);

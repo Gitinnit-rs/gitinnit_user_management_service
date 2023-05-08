@@ -90,6 +90,14 @@ export const addMusicFile = async (
   if (music_obj.status !== 200) {
     return { status: 400, data: "Error while adding music meta data" };
   }
+  const music_mapping: MusicMapping = {
+    music_id: music_obj.data[0].id,
+    artist_id: artist_id,
+  };
+  const new_obj = await insertRow("music_mapping", music_mapping);
+  if (new_obj.status !== 200) {
+    return { status: 400, data: "Error while adding mapping" };
+  }
   if (artists.length === 0) {
     return music_obj;
   }

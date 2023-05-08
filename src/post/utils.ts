@@ -18,9 +18,9 @@ export const getPost = async (matchQuery: object) => {
   if (
     post.data[0].type !== "music" &&
     post.data[0].type !== "album" &&
-    post.data[0].type === "image"
+    post.data[0].type !== "image" &&
+    post.data[0].type !== "text"
   ) {
-    console.log(post.data[0].type === "music");
     return {
       status: 400,
       data: "Something went wrong, invalid type for post:" + post.data[0].type,

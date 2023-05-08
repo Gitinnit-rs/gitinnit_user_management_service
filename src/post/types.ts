@@ -1,6 +1,13 @@
+enum PostType {
+  music,
+  album,
+  image,
+  text,
+}
+
 export type Post = {
-  content_id: string;
-  type: "music" | "album" | "image";
+  content_id?: string;
+  type: PostType;
   likes_count?: number | null;
   comment_count?: number | null;
   tags?: string[] | null;

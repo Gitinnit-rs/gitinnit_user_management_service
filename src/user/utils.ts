@@ -13,10 +13,10 @@ export const createUser = async (user: User) => {
 };
 
 // READ A SPECIFIC USER
-export const getUser = async (id: string) => {
+export const getUser = async (searchQuery: object) => {
   let query = {
     tableName: "user",
-    matchQuery: { id: id },
+    matchQuery: searchQuery,
   };
   return await getData(query);
 };
@@ -25,7 +25,7 @@ export const getUser = async (id: string) => {
 export const getUserByName = async (name: string) => {
   let query = {
     tableName: "user",
-    selectQuery: "name, id",
+    selectQuery: "name, id, username",
     likeQuery: "%" + name + "%",
   };
   return await getSimilarData(query);

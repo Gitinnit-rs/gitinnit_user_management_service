@@ -23,9 +23,9 @@ router.post("/", async (req, res) => {
 });
 
 // GET SPECIFIC USER
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-  const obj = await getUser(id);
+router.get("/", async (req, res) => {
+  const searchQuery = req.query;
+  const obj = await getUser(searchQuery);
   res.status(obj.status).send(obj.data);
 });
 

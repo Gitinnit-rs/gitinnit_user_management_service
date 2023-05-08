@@ -5,6 +5,7 @@ import {
   deleteData,
   getSimilarData,
 } from "../../utils/db";
+import { getMusic } from "../music/utils";
 import { User } from "./types";
 
 // CREATE A NEW USER
@@ -13,12 +14,36 @@ export const createUser = async (user: User) => {
 };
 
 // READ A SPECIFIC USER
-export const getUser = async (searchQuery: object) => {
+export const getUser = async (searchQuery: any) => {
+  console.log(searchQuery);
+  let includeMusic = false;
+  if ("includeMusic" in searchQuery) {
+    includeMusic = searchQuery.includeMusic;
+    delete searchQuery.includeMusic;
+  }
+  console.log(searchQuery);
   let query = {
     tableName: "user",
     matchQuery: searchQuery,
   };
-  return await getData(query);
+  let user = await getData(query);
+  if (user.status !== 200) {
+    return {
+      data: "Couldn't get user",
+      status: 400,
+    };
+  }
+  if (includeMusic) {
+    let music = await getMusic({ artist_id: user.data[0].id });
+    if (music.status !== 200) {
+      return {
+        data: "Couldn't get music for the user",
+        status: 400,
+      };
+    }
+    user.data[0].music = music.data;
+  }
+  return user;
 };
 
 // READ A SPECIFIC USER BY NAME

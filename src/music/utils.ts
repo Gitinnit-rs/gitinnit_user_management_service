@@ -96,6 +96,9 @@ export const addMusicFile = async (
 
   var obj: boolean[] = await Promise.all(
     artists.map(async (artist): Promise<boolean> => {
+      if (artist.trim() === "") {
+        return true;
+      }
       const music_mapping: MusicMapping = {
         music_id: music_obj.data[0].id,
         artist_id: artist,
@@ -180,7 +183,17 @@ export const createAlbum = async (coverImage: any, album: Album) => {
 
   album.release_date = new Date();
   album.cover_url = cover_url.data;
-  return await insertRow("album", album);
+  let musics = album.musics;
+  delete album.musics;
+  let album_obj = await insertRow("album", album);
+  if (musics && musics?.length > 0) {
+    return await addMusicAlbumMapping(
+      album.artist_id,
+      album_obj.data[0].id,
+      musics,
+    );
+  }
+  return album_obj;
 };
 
 const getMusicForAlbum = async (album_id: string) => {

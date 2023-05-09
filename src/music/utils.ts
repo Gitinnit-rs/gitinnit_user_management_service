@@ -177,22 +177,30 @@ export const getMusicByName = async (name: string) => {
 };
 
 // CREATE A NEW ALBUM
-export const createAlbum = async (coverImage: any, album: Album) => {
+export const createAlbum = async (
+  coverImage: any,
+  name: string,
+  musics: string[],
+  artist_id: string,
+) => {
   const fileId: string = uuid();
   const cover_url = await addFileToStorage(
     "images",
     fileId,
     coverImage,
-    album.artist_id,
+    artist_id,
   );
   if (cover_url.status == 400) {
     return cover_url;
   }
 
-  album.release_date = new Date();
-  album.cover_url = cover_url.data;
-  let musics = album.musics;
-  delete album.musics;
+  let release_date = new Date();
+  let album = {
+    name,
+    artist_id,
+    release_date,
+    cover_url: cover_url.data,
+  };
   let album_obj = await insertRow("album", album);
   if (musics && musics?.length > 0) {
     return await addMusicAlbumMapping(

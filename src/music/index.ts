@@ -81,9 +81,9 @@ router.post("/album", upload.any(), resolveAccessToken, async (req, res) => {
     res.status(400).send("No cover file found");
     return;
   }
-  const { album } = req.body;
+  const { name, musics, artist_id } = req.body;
   const coverFile = (req.files as Express.Multer.File[])[0];
-  const obj = await createAlbum(coverFile, album);
+  const obj = await createAlbum(coverFile, name, musics, artist_id);
   res.status(obj.status).send(obj.data);
 });
 

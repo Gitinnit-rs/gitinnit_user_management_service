@@ -5,7 +5,8 @@ import {
   deleteData,
   getSimilarData,
 } from "../../utils/db";
-import { getMusic } from "../music/utils";
+import { getAlbum, getMusic } from "../music/utils";
+import { getPost } from "../post/utils";
 import { User } from "./types";
 
 // CREATE A NEW USER
@@ -15,13 +16,21 @@ export const createUser = async (user: User) => {
 
 // READ A SPECIFIC USER
 export const getUser = async (searchQuery: any) => {
-  console.log(searchQuery);
   let includeMusic = false;
+  let includeAlbum = false;
+  let includePost = false;
   if ("includeMusic" in searchQuery) {
     includeMusic = searchQuery.includeMusic;
     delete searchQuery.includeMusic;
   }
-  console.log(searchQuery);
+  if ("includeAlbum" in searchQuery) {
+    includeAlbum = searchQuery.includeAlbum;
+    delete searchQuery.includeAlbum;
+  }
+  if ("includePost" in searchQuery) {
+    includePost = searchQuery.includePost;
+    delete searchQuery.includePost;
+  }
   let query = {
     tableName: "user",
     matchQuery: searchQuery,
@@ -48,6 +57,26 @@ export const getUser = async (searchQuery: any) => {
       };
     }
     user.data[0].music = music.data;
+  }
+  if (includeAlbum) {
+    let album = await getAlbum({ artist_id: user.data[0].id });
+    if (album.status !== 200) {
+      return {
+        data: "Couldn't get album for the user",
+        status: 400,
+      };
+    }
+    user.data[0].album = album.data;
+  }
+  if (includePost) {
+    let post = await getPost({ artist_id: user.data[0].id });
+    if (post.status !== 200) {
+      return {
+        data: "Couldn't get post for the user",
+        status: 400,
+      };
+    }
+    user.data[0].post = post.data;
   }
   return user;
 };

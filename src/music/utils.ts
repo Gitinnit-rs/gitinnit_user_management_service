@@ -266,10 +266,17 @@ export const addMusicAlbumMapping = async (
 ) => {
   const getQuery = {
     tableName: "album",
-    matchQuery: { album_id: album_id },
+    matchQuery: { id: album_id },
   };
   const album = await getData(getQuery);
-  if (album.data.owner_artist !== artist_id) {
+  if (album.status !== 200) {
+    return {
+      data: "Error while fetching album",
+      status: 400,
+    };
+  }
+  console.log(album, musics);
+  if (album.data[0].artist_id !== artist_id) {
     return {
       data: "Not the owner of the album",
       status: 400,

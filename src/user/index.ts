@@ -66,8 +66,8 @@ router.post("/unfollow", resolveAccessToken, async (req, res) => {
 });
 
 // GET LIST OF FOLLOWERS FOR A USER
-router.get("/followers", async (req, res) => {
-  const { id } = req.body;
+router.get("/followers/:id", async (req, res) => {
+  const { id } = req.params;
   const data = await getFollowers(id);
   res.status(data.status).send(data.data);
 });

@@ -260,7 +260,10 @@ export const deleteStorageObject = async (
 export const follow_rpc = async (obj: object) => {
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
   // @ts-ignore
-  let response = await supabase.rpc("followuser", obj);
-  console.log(response);
-  return response;
+  return await supabase.rpc("followuser", obj);
+};
+export const unfollow_rpc = async (obj: object) => {
+  const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // @ts-ignore
+  return await supabase.rpc("unfollow_user", obj);
 };

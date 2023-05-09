@@ -5,6 +5,7 @@ import {
   deleteData,
   getSimilarData,
   follow_rpc,
+  unfollow_rpc,
 } from "../../utils/db";
 import { getAlbum, getMusic } from "../music/utils";
 import { getPost } from "../post/utils";
@@ -127,16 +128,11 @@ export const unfollowUser = async (
   follower_id: string,
   following_id: string,
 ) => {
-  let matchQuery = {
-    follower_id: follower_id,
-    following_id: following_id,
+  let obj = {
+    follower_id_arg: follower_id,
+    following_id_arg: following_id,
   };
-  let query = {
-    tableName: "follow",
-    matchQuery: matchQuery,
-  };
-
-  return await deleteData(query);
+  return await unfollow_rpc(obj);
 };
 
 // GET FOLLOWERS OF A USER

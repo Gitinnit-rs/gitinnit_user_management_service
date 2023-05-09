@@ -22,10 +22,14 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/search/:name", async (req, res) => {
-  const { name } = req.params;
-  const obj = await searchByName(name);
-  res.status(obj.status).send(obj.data);
-  return;
+  try {
+    const { name } = req.params;
+    const obj = await searchByName(name);
+    res.status(obj.status).send(obj.data);
+    return;
+  } catch (e) {
+    res.status(400).send(e);
+  }
 });
 
 app.listen(PORT, () => {

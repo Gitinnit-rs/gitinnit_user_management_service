@@ -62,7 +62,30 @@ export const getPost = async (matchQuery: object) => {
 
 // CREATE A COMMENT
 export const createComment = async (comment: Comment) => {
-  return await insertRow("comment", comment);
+  const obj = await insertRow("comment", comment);
+  if (obj.status === 200) {
+    const getQuery = {
+      tableName: "post",
+      matchQuery: {
+        id: comment.post_id,
+      },
+    };
+    let new_obj = await getData(getQuery);
+    const newCommentCount = new_obj.data[0].comment_count + 1;
+
+    const updateQuery = {
+      tableName: "post",
+      matchQuery: {
+        id: comment.post_id,
+      },
+      updateQuery: {
+        comment_count: newCommentCount,
+      },
+    };
+    return await updateData(updateQuery);
+  } else {
+    return { status: 400, data: "Failed to add comment_count" };
+  }
 };
 
 // LIKE A POST

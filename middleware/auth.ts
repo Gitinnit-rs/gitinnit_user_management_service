@@ -5,8 +5,8 @@ export const resolveAccessToken = async (req, res, next) => {
   if (req.artist_id) {
     delete req.artist_id;
   }
-  console.log(req.body);
-  if (!req.body.access_token) {
+  const access_token = req.headers.authorization;
+  if (!access_token) {
     res.status(400).send("No access token found");
     return;
   }
@@ -14,14 +14,13 @@ export const resolveAccessToken = async (req, res, next) => {
   const { data, status } = await axios.get(github_url, {
     headers: {
       Accept: "application/vnd.github+json",
-      Authorization: "Bearer " + req.body.access_token,
+      Authorization: access_token,
     },
   });
   if (status !== 200) {
     res.status(400).send("Unable to get user");
     return;
   }
-  delete req.body.access_token;
   req.body.artist_id = data.id;
   next();
 };

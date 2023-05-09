@@ -28,32 +28,32 @@ export const getPost = async (matchQuery: object) => {
     // @ts-ignore
     posts.data.map(async post => {
       if (
-        post.data[0].type !== "music" &&
-        post.data[0].type !== "album" &&
-        post.data[0].type !== "image" &&
-        post.data[0].type !== "text"
+        post.type !== "music" &&
+        post.type !== "album" &&
+        post.type !== "image" &&
+        post.type !== "text"
       ) {
         return {
           status: 400,
-          data:
-            "Something went wrong, invalid type for post:" + post.data[0].type,
+          data: "Something went wrong, invalid type for post:" + post.type,
         };
       }
-      let mediaQuery = {
-        tableName: post.data[0].type,
-        matchQuery: { id: post.data[0].content_id },
-      };
-      if (post.data[0].type === "music") {
-        let media = await getMusic(mediaQuery);
-        post.data[0].media = media.data[0];
-      } else if (post.data[0].type === "album") {
-        let media = await getAlbum(mediaQuery);
-        post.data[0].media = media.data[0];
-      } else if (post.data[0].type === "image") {
+
+      if (post.type === "music") {
+        let media = await getMusic({ id: post.content_id });
+        post.media = media.data[0];
+      } else if (post.type === "album") {
+        let media = await getAlbum({ id: post.content_id });
+        post.media = media.data[0];
+      } else if (post.type === "image") {
+        const mediaQuery = {
+          tableName: "images",
+          id: post.content_id,
+        };
         let media = await getData(mediaQuery);
-        post.data[0].media = media.data[0];
+        post.media = media.data[0];
       }
-      delete post.data[0].content_id;
+      delete post.content_id;
       return post;
     }),
   );

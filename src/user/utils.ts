@@ -33,6 +33,12 @@ export const getUser = async (searchQuery: any) => {
       status: 400,
     };
   }
+  if (user.data.length === 0) {
+    return {
+      data: "Couldn't find user",
+      status: 404,
+    };
+  }
   if (includeMusic) {
     let music = await getMusic({ artist_id: user.data[0].id });
     if (music.status !== 200) {

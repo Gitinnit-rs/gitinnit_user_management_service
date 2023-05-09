@@ -151,7 +151,7 @@ export const getMusic = async (searchQuery: object) => {
         artists.data.map(async (artist: any) => {
           const anotherQuery = {
             tableName: "user",
-            selectQuery: "name, id",
+            selectQuery: "name, username, id",
             matchQuery: { id: artist.artist_id },
           };
           let name = await getData(anotherQuery);

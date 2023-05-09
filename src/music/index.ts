@@ -75,22 +75,17 @@ router.get("/name/:name", async (req, res) => {
 });
 
 // CREATE ALBUM
-router.post(
-  "/album",
-  upload.array("files", 5),
-  resolveAccessToken,
-  async (req, res) => {
-    // @ts-ignore
-    if (req.files.length === 0) {
-      res.status(400).send("No cover file found");
-      return;
-    }
-    const { album } = req.body;
-    const coverFile = (req.files as Express.Multer.File[])[0];
-    const obj = await createAlbum(coverFile, album);
-    res.status(obj.status).send(obj.data);
-  },
-);
+router.post("/album", upload.any(), resolveAccessToken, async (req, res) => {
+  // @ts-ignore
+  if (req.files.length === 0) {
+    res.status(400).send("No cover file found");
+    return;
+  }
+  const { name, musics, artist_id } = req.body;
+  const coverFile = (req.files as Express.Multer.File[])[0];
+  const obj = await createAlbum(coverFile, name, musics, artist_id);
+  res.status(obj.status).send(obj.data);
+});
 
 // GET ALBUM BY ID
 router.get("/album", async (req, res) => {

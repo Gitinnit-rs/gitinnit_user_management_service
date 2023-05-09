@@ -25,6 +25,7 @@ export type Album = {
   cover_url?: string;
   artist_id: string;
   release_date: Date | null;
+  musics?: string[] | null;
 };
 
 export type AlbumMapping = {

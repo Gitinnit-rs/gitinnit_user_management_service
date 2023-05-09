@@ -90,12 +90,23 @@ export const addMusicFile = async (
   if (music_obj.status !== 200) {
     return { status: 400, data: "Error while adding music meta data" };
   }
+  const music_mapping: MusicMapping = {
+    music_id: music_obj.data[0].id,
+    artist_id: artist_id,
+  };
+  const new_obj = await insertRow("music_mapping", music_mapping);
+  if (new_obj.status !== 200) {
+    return { status: 400, data: "Error while adding mapping" };
+  }
   if (artists.length === 0) {
     return music_obj;
   }
 
   var obj: boolean[] = await Promise.all(
     artists.map(async (artist): Promise<boolean> => {
+      if (typeof artist === "string" && artist.trim() === "") {
+        return true;
+      }
       const music_mapping: MusicMapping = {
         music_id: music_obj.data[0].id,
         artist_id: artist,
@@ -140,7 +151,7 @@ export const getMusic = async (searchQuery: object) => {
         artists.data.map(async (artist: any) => {
           const anotherQuery = {
             tableName: "user",
-            selectQuery: "name, id",
+            selectQuery: "name, username, id",
             matchQuery: { id: artist.artist_id },
           };
           let name = await getData(anotherQuery);
@@ -166,21 +177,39 @@ export const getMusicByName = async (name: string) => {
 };
 
 // CREATE A NEW ALBUM
-export const createAlbum = async (coverImage: any, album: Album) => {
+export const createAlbum = async (
+  coverImage: any,
+  name: string,
+  musics: string[],
+  artist_id: string,
+) => {
   const fileId: string = uuid();
   const cover_url = await addFileToStorage(
     "images",
     fileId,
     coverImage,
-    album.artist_id,
+    artist_id,
   );
   if (cover_url.status == 400) {
     return cover_url;
   }
 
-  album.release_date = new Date();
-  album.cover_url = cover_url.data;
-  return await insertRow("album", album);
+  let release_date = new Date();
+  let album = {
+    name,
+    artist_id,
+    release_date,
+    cover_url: cover_url.data,
+  };
+  let album_obj = await insertRow("album", album);
+  if (musics && musics?.length > 0) {
+    return await addMusicAlbumMapping(
+      album.artist_id,
+      album_obj.data[0].id,
+      musics,
+    );
+  }
+  return album_obj;
 };
 
 const getMusicForAlbum = async (album_id: string) => {
@@ -237,10 +266,16 @@ export const addMusicAlbumMapping = async (
 ) => {
   const getQuery = {
     tableName: "album",
-    matchQuery: { album_id: album_id },
+    matchQuery: { id: album_id },
   };
   const album = await getData(getQuery);
-  if (album.data.owner_artist !== artist_id) {
+  if (album.status !== 200) {
+    return {
+      data: "Error while fetching album",
+      status: 400,
+    };
+  }
+  if (album.data[0].artist_id !== artist_id) {
     return {
       data: "Not the owner of the album",
       status: 400,
@@ -261,7 +296,7 @@ export const addMusicAlbumMapping = async (
       return e === true;
     })
   ) {
-    return { status: 200, data: "SUCCESS" };
+    return { status: 200, data: { id: album_id } };
   } else {
     return { status: 400, data: "Error while adding mapping" };
   }

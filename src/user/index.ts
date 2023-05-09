@@ -40,12 +40,11 @@ router.get("/name/:name", async (req, res) => {
 // FOLLOW A USER
 router.post("/follow", resolveAccessToken, async (req, res) => {
   const { follower_id, following_id } = req.body;
-  console.log(req.body);
-  if (req.body.artist_id != following_id) {
+  if (req.body.artist_id != follower_id) {
     res
       .status(400)
       .send(
-        `Mismatch between artist_id: ${req.body.artist_id} and following_id: ${following_id}`
+        `Mismatch between artist_id: ${req.body.artist_id} and follower_id: ${follower_id}`
       );
   }
   const obj = await followUser(follower_id, following_id);
@@ -55,11 +54,11 @@ router.post("/follow", resolveAccessToken, async (req, res) => {
 // UNFOLLOW A USER
 router.post("/unfollow", resolveAccessToken, async (req, res) => {
   const { follower_id, following_id } = req.body;
-  if (req.body.artist_id != following_id) {
+  if (req.body.artist_id != follower_id) {
     res
       .status(400)
       .send(
-        `Mismatch between artist_id: ${req.body.artist_id} and following_id: ${following_id}`
+        `Mismatch between artist_id: ${req.body.artist_id} and follower_id: ${follower_id}`
       );
   }
   const obj = await unfollowUser(follower_id, following_id);
@@ -67,9 +66,8 @@ router.post("/unfollow", resolveAccessToken, async (req, res) => {
 });
 
 // GET LIST OF FOLLOWERS FOR A USER
-router.post("/followers", async (req, res) => {
-  console.log(req.body);
-  const { id } = req.body;
+router.get("/followers/:id", async (req, res) => {
+  const { id } = req.params;
   const data = await getFollowers(id);
   res.status(data.status).send(data.data);
 });

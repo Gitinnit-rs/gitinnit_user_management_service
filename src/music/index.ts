@@ -130,8 +130,8 @@ router.post("/mapping/", resolveAccessToken, async (req, res) => {
   try {
     // albumId is the id of albums type: string
     // musics is a list of music ids type: string[]
-    const { artist_id, albumId, musics } = req.body;
-    const obj = await addMusicAlbumMapping(artist_id, albumId, musics);
+    const { artist_id, album_id, musics } = req.body;
+    const obj = await addMusicAlbumMapping(artist_id, album_id, musics);
     res.status(obj.status).send(obj.data);
   } catch (e) {
     res.status(400).send(e);
@@ -143,8 +143,8 @@ router.post("/delete_mapping/", resolveAccessToken, async (req, res) => {
   try {
     // albumId is the id of albums type: string
     // musics is a list of music ids type: string[]
-    const { artist_id, albumId, musics } = req.body;
-    const obj = await removeMusicAlbumMapping(artist_id, albumId, musics);
+    const { artist_id, album_id, musics } = req.body;
+    const obj = await removeMusicAlbumMapping(artist_id, album_id, musics);
     res.status(obj.status).send(obj.data);
   } catch (e) {
     res.status(400).send(e);

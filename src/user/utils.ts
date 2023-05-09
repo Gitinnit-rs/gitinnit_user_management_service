@@ -49,6 +49,11 @@ export const getUser = async (searchQuery: any) => {
       data: "Couldn't find user",
       status: 404,
     };
+  } else if (user.data.length > 1) {
+    return {
+      data: "Couldn't find a specific user. Found:" + user,
+      status: 400,
+    };
   }
   if (includeMusic) {
     let music = await getMusic({ artist_id: user.data[0].id });

@@ -14,34 +14,50 @@ export const getPost = async (matchQuery: object) => {
     tableName: "post",
     matchQuery: matchQuery,
   };
-  let post = await getData(query);
-  if (
-    post.data[0].type !== "music" &&
-    post.data[0].type !== "album" &&
-    post.data[0].type !== "image" &&
-    post.data[0].type !== "text"
-  ) {
+  let posts = await getData(query);
+  if (posts.status !== 200) {
     return {
+      data: "Couldn't find posts",
       status: 400,
-      data: "Something went wrong, invalid type for post:" + post.data[0].type,
     };
   }
-  let mediaQuery = {
-    tableName: post.data[0].type,
-    matchQuery: { id: post.data[0].content_id },
-  };
-  if (post.data[0].type === "music") {
-    let media = await getMusic(mediaQuery);
-    post.data[0].media = media.data[0];
-  } else if (post.data[0].type === "album") {
-    let media = await getAlbum(mediaQuery);
-    post.data[0].media = media.data[0];
-  } else if (post.data[0].type === "image") {
-    let media = await getData(mediaQuery);
-    post.data[0].media = media.data[0];
+  if (posts.data.length < 1) {
+    return posts;
   }
-  delete post.data[0].content_id;
-  return post;
+  await Promise.all(
+    // @ts-ignore
+    posts.data.map(async post => {
+      if (
+        post.data[0].type !== "music" &&
+        post.data[0].type !== "album" &&
+        post.data[0].type !== "image" &&
+        post.data[0].type !== "text"
+      ) {
+        return {
+          status: 400,
+          data:
+            "Something went wrong, invalid type for post:" + post.data[0].type,
+        };
+      }
+      let mediaQuery = {
+        tableName: post.data[0].type,
+        matchQuery: { id: post.data[0].content_id },
+      };
+      if (post.data[0].type === "music") {
+        let media = await getMusic(mediaQuery);
+        post.data[0].media = media.data[0];
+      } else if (post.data[0].type === "album") {
+        let media = await getAlbum(mediaQuery);
+        post.data[0].media = media.data[0];
+      } else if (post.data[0].type === "image") {
+        let media = await getData(mediaQuery);
+        post.data[0].media = media.data[0];
+      }
+      delete post.data[0].content_id;
+      return post;
+    }),
+  );
+  return posts;
 };
 
 // CREATE A COMMENT

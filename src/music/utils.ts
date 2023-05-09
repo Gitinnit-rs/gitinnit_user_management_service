@@ -275,7 +275,6 @@ export const addMusicAlbumMapping = async (
       status: 400,
     };
   }
-  console.log(album, musics);
   if (album.data[0].artist_id !== artist_id) {
     return {
       data: "Not the owner of the album",
@@ -297,7 +296,7 @@ export const addMusicAlbumMapping = async (
       return e === true;
     })
   ) {
-    return { status: 200, data: "SUCCESS" };
+    return { status: 200, data: { id: album_id } };
   } else {
     return { status: 400, data: "Error while adding mapping" };
   }

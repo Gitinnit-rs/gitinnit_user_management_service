@@ -19,6 +19,8 @@ const router = express.Router();
 // CREATE USER
 router.post("/", resolveAccessToken, async (req, res) => {
   try {
+    req.body.id = req.body.artist_id;
+    delete req.body.artist_id;
     const user: User = req.body;
     const obj = await createUser(user);
     res.status(obj.status).send(obj.data);

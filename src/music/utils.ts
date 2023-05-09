@@ -253,6 +253,7 @@ export const getAlbum = async (searchQuery: object) => {
 export const getAlbumByName = async (name: string) => {
   let query = {
     tableName: "album",
+    selectQuery: "name, id",
     likeQuery: "%" + name + "%",
   };
   return await getSimilarData(query);

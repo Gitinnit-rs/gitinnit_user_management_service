@@ -4,6 +4,7 @@ import {
   updateData,
   deleteData,
   getSimilarData,
+  follow_rpc,
 } from "../../utils/db";
 import { getAlbum, getMusic } from "../music/utils";
 import { getPost } from "../post/utils";
@@ -115,10 +116,10 @@ export const deleteUser = async (id: string) => {
 // FOLLOW USER
 export const followUser = async (follower_id: string, following_id: string) => {
   let obj = {
-    follower_id: follower_id,
-    following_id: following_id,
+    follower_id_arg: follower_id,
+    following_id_arg: following_id,
   };
-  return await insertRow("follow", obj);
+  return await follow_rpc(obj);
 };
 
 // UNFOLLOW USER

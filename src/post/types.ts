@@ -1,18 +1,20 @@
 enum PostType {
   music,
   album,
-  image,
   text,
 }
 
 export type Post = {
-  content_id?: string;
   type: PostType;
+  caption: string | null;
+  artist_id: string;
+
+  content_id?: string;
   likes_count?: number | null;
   comment_count?: number | null;
   tags?: string[] | null;
-  caption: string | null;
-  artist_id: string;
+  image_url?: string | null;
+  release_date?: Date | null;
 };
 
 export type Comment = {

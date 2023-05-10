@@ -1,8 +1,49 @@
-import { getData, insertRow, updateData, deleteData } from "../../utils/db";
+import {
+  getData,
+  insertRow,
+  deleteData,
+  updateData,
+  getPublicUrl,
+  addToStorage,
+} from "../../utils/db";
 import { searchParameters } from "../../utils/types";
 import { getAlbum, getMusic } from "../music/utils";
 
 import { Post, Like, Comment } from "./types";
+
+export const addFileToStorage = async (
+  type: string,
+  fileId: string,
+  file: any,
+  artist_id: string,
+) => {
+  if (type !== "music" && type !== "images") {
+    return { status: 400, data: "Error while adding music file" };
+  }
+  const fileOptions = {
+    contentType: file.mimetype,
+  };
+  const file_obj = await addToStorage(
+    `${type}/${artist_id}`,
+    fileId,
+    file.buffer,
+    fileOptions,
+  );
+  if (file_obj.status !== 200) {
+    return { status: 400, data: `Error while adding ${type} file` };
+  }
+  const publicUrl = await getPublicUrl(
+    `${type}/${artist_id}`,
+    file_obj.data.path,
+  );
+  if ("status" in publicUrl && publicUrl.status !== 200) {
+    return { status: 400, data: `Error while getting ${type} file url` };
+  }
+  return {
+    status: 200,
+    data: (publicUrl.data as { publicUrl: string }).publicUrl,
+  };
+};
 
 // CREATE POST
 export const createPost = async (post: Post) => {
@@ -53,7 +94,6 @@ export const getPost = async (searchQuery: object) => {
       if (
         post.type !== "music" &&
         post.type !== "album" &&
-        post.type !== "image" &&
         post.type !== "text"
       ) {
         return {
@@ -67,13 +107,6 @@ export const getPost = async (searchQuery: object) => {
         post.media = media.data[0];
       } else if (post.type === "album") {
         let media = await getAlbum({ id: post.content_id });
-        post.media = media.data[0];
-      } else if (post.type === "image") {
-        const mediaQuery = {
-          tableName: "images",
-          id: post.content_id,
-        };
-        let media = await getData(mediaQuery);
         post.media = media.data[0];
       }
       delete post.content_id;

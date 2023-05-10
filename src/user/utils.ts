@@ -37,55 +37,56 @@ export const getUser = async (searchQuery: any) => {
     tableName: "user",
     matchQuery: searchQuery,
   };
-  let user = await getData(query);
-  if (user.status !== 200) {
+  let users = await getData(query);
+  console.log(users);
+  if (users.status !== 200) {
     return {
       data: "Couldn't get user",
       status: 400,
     };
   }
-  if (user.data.length === 0) {
+  if (users.data.length === 0) {
     return {
       data: "Couldn't find user",
       status: 404,
     };
-  } else if (user.data.length > 1) {
-    return {
-      data: "Couldn't find a specific user. Found:" + user,
-      status: 400,
-    };
   }
-  if (includeMusic) {
-    let music = await getMusic({ artist_id: user.data[0].id });
-    if (music.status !== 200) {
-      return {
-        data: "Couldn't get music for the user",
-        status: 400,
-      };
-    }
-    user.data[0].music = music.data;
-  }
-  if (includeAlbum) {
-    let album = await getAlbum({ artist_id: user.data[0].id });
-    if (album.status !== 200) {
-      return {
-        data: "Couldn't get album for the user",
-        status: 400,
-      };
-    }
-    user.data[0].album = album.data;
-  }
-  if (includePost) {
-    let post = await getPost({ artist_id: user.data[0].id });
-    if (post.status !== 200) {
-      return {
-        data: "Couldn't get post for the user",
-        status: 400,
-      };
-    }
-    user.data[0].post = post.data;
-  }
-  return user;
+  await Promise.all(
+    // @ts-ignore
+    users.data.map(async user => {
+      if (includeMusic) {
+        let music = await getMusic({ artist_id: user.id });
+        if (music.status !== 200) {
+          return {
+            data: "Couldn't get music for the user",
+            status: 400,
+          };
+        }
+        user.music = music.data;
+      }
+      if (includeAlbum) {
+        let album = await getAlbum({ artist_id: user.id });
+        if (album.status !== 200) {
+          return {
+            data: "Couldn't get album for the user",
+            status: 400,
+          };
+        }
+        user.album = album.data;
+      }
+      if (includePost) {
+        let post = await getPost({ artist_id: user.id });
+        if (post.status !== 200) {
+          return {
+            data: "Couldn't get post for the user",
+            status: 400,
+          };
+        }
+        user.post = post.data;
+      }
+    }),
+  );
+  return users;
 };
 
 // READ A SPECIFIC USER BY NAME

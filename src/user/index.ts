@@ -24,8 +24,8 @@ router.post("/", resolveAccessToken, async (req, res) => {
     const user: User = req.body;
     const obj = await createUser(user);
     res.status(obj.status).send(obj.data);
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (e: any) {
+    res.status(400).send(e.message);
   }
 });
 
@@ -35,8 +35,8 @@ router.get("/", async (req, res) => {
     const searchQuery = req.query;
     const obj = await getUser(searchQuery);
     res.status(obj.status).send(obj.data);
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (e: any) {
+    res.status(400).send(e.message);
   }
 });
 
@@ -46,8 +46,8 @@ router.get("/name/:name", async (req, res) => {
     const { name } = req.params;
     const obj = await getUserByName(name);
     res.status(obj.status).send(obj.data);
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (e: any) {
+    res.status(400).send(e.message);
   }
 });
 
@@ -64,8 +64,8 @@ router.post("/follow", resolveAccessToken, async (req, res) => {
     }
     const obj = await followUser(follower_id, following_id);
     res.status(obj.status).send(obj.data);
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (e: any) {
+    res.status(400).send(e.message);
   }
 });
 
@@ -82,8 +82,8 @@ router.post("/unfollow", resolveAccessToken, async (req, res) => {
     }
     const obj = await unfollowUser(follower_id, following_id);
     res.status(obj.status).send(obj.data);
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (e: any) {
+    res.status(400).send(e.message);
   }
 });
 
@@ -93,8 +93,8 @@ router.get("/followers/:id", async (req, res) => {
     const { id } = req.params;
     const data = await getFollowers(id);
     res.status(data.status).send(data.data);
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (e: any) {
+    res.status(400).send(e.message);
   }
 });
 
@@ -106,8 +106,8 @@ router.patch("/", resolveAccessToken, async (req, res) => {
     const { id, user } = req.body;
     const data = await updateUser(id, user);
     res.status(data.status).send(data.data);
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (e: any) {
+    res.status(400).send(e.message);
   }
 });
 

@@ -7,6 +7,7 @@ import {
   follow_rpc,
   unfollow_rpc,
 } from "../../utils/db";
+import { searchParameters } from "../../utils/types";
 import { getAlbum, getMusic } from "../music/utils";
 import { getPost } from "../post/utils";
 import { User } from "./types";
@@ -21,6 +22,7 @@ export const getUser = async (searchQuery: any) => {
   let includeMusic = false;
   let includeAlbum = false;
   let includePost = false;
+  console.log(searchQuery);
   if ("includeMusic" in searchQuery) {
     includeMusic = searchQuery.includeMusic;
     delete searchQuery.includeMusic;
@@ -33,14 +35,36 @@ export const getUser = async (searchQuery: any) => {
     includePost = searchQuery.includePost;
     delete searchQuery.includePost;
   }
-  let query = {
+
+  let query: searchParameters = {
     tableName: "user",
     matchQuery: searchQuery,
+    sortQuery: {},
   };
+
+  if ("sort" in searchQuery) {
+    //@ts-ignore
+    query.sortQuery.column = searchQuery.sort;
+    if ("ascending" in searchQuery) {
+      //@ts-ignore
+      query.sortQuery.ascending = searchQuery.ascending === "true";
+      delete searchQuery.ascending;
+    }
+    delete searchQuery.sort;
+  }
+  if ("limit" in searchQuery) {
+    query.limitQuery = +searchQuery.limit;
+    delete searchQuery.limit;
+  }
+  if ("select" in searchQuery) {
+    query.selectQuery = searchQuery.select;
+    delete searchQuery.select;
+  }
+  query.matchQuery = searchQuery;
   let users = await getData(query);
   if (users.status !== 200) {
     return {
-      data: "Couldn't get user",
+      data: "Couldn't get user" + users.data,
       status: 400,
     };
   }

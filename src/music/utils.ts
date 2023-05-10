@@ -132,6 +132,27 @@ export const getMusic = async (searchQuery: object) => {
     tableName: "music",
     matchQuery: searchQuery,
   };
+  if ("sort" in searchQuery) {
+    //@ts-ignore
+    query.sortQuery.column = searchQuery.sort;
+    if ("ascending" in searchQuery) {
+      //@ts-ignore
+      query.sortQuery.ascending = searchQuery.ascending === "true";
+      delete searchQuery.ascending;
+    }
+    delete searchQuery.sort;
+  }
+  if ("limit" in searchQuery) {
+    //@ts-ignore
+    query.limitQuery = +searchQuery.limit;
+    delete searchQuery.limit;
+  }
+  if ("select" in searchQuery) {
+    //@ts-ignore
+    query.selectQuery = searchQuery.select;
+    delete searchQuery.select;
+  }
+  query.matchQuery = searchQuery;
   let musics = await getData(query);
   if (musics.status !== 200) {
     return musics;
@@ -236,6 +257,27 @@ export const getAlbum = async (searchQuery: object) => {
     tableName: "album",
     matchQuery: searchQuery,
   };
+  if ("sort" in searchQuery) {
+    //@ts-ignore
+    query.sortQuery.column = searchQuery.sort;
+    if ("ascending" in searchQuery) {
+      //@ts-ignore
+      query.sortQuery.ascending = searchQuery.ascending === "true";
+      delete searchQuery.ascending;
+    }
+    delete searchQuery.sort;
+  }
+  if ("limit" in searchQuery) {
+    //@ts-ignore
+    query.limitQuery = +searchQuery.limit;
+    delete searchQuery.limit;
+  }
+  if ("select" in searchQuery) {
+    //@ts-ignore
+    query.selectQuery = searchQuery.select;
+    delete searchQuery.select;
+  }
+  query.matchQuery = searchQuery;
   let albums = await getData(query);
   await Promise.all(
     albums.data.map(async (album: any) => {

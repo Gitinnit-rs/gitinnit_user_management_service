@@ -1,4 +1,5 @@
 import { getData, insertRow, updateData, deleteData } from "../../utils/db";
+import { searchParameters } from "../../utils/types";
 import { getAlbum, getMusic } from "../music/utils";
 
 import { Post, Like, Comment } from "./types";
@@ -9,11 +10,33 @@ export const createPost = async (post: Post) => {
 };
 
 // GET POST BY ID
-export const getPost = async (matchQuery: object) => {
-  const query = {
+export const getPost = async (searchQuery: object) => {
+  const query: searchParameters = {
     tableName: "post",
-    matchQuery: matchQuery,
+    matchQuery: searchQuery,
+    sortQuery: {},
   };
+  if ("sort" in searchQuery) {
+    //@ts-ignore
+    query.sortQuery.column = searchQuery.sort;
+    if ("ascending" in searchQuery) {
+      //@ts-ignore
+      query.sortQuery.ascending = searchQuery.ascending === "true";
+      delete searchQuery.ascending;
+    }
+    delete searchQuery.sort;
+  }
+  if ("limit" in searchQuery) {
+    //@ts-ignore
+    query.limitQuery = +searchQuery.limit;
+    delete searchQuery.limit;
+  }
+  if ("select" in searchQuery) {
+    //@ts-ignore
+    query.selectQuery = searchQuery.select;
+    delete searchQuery.select;
+  }
+  query.matchQuery = searchQuery;
   let posts = await getData(query);
   if (posts.status !== 200) {
     return {

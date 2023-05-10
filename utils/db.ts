@@ -11,6 +11,8 @@ export const getData = async ({
   tableName,
   selectQuery = null,
   matchQuery = null,
+  sortQuery = null,
+  limitQuery = null,
 }: searchParameters) => {
   const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
   let query = supabase.from(tableName).select();
@@ -19,6 +21,16 @@ export const getData = async ({
   }
   if (matchQuery !== null) {
     query = query.match(matchQuery);
+  }
+  if (sortQuery !== null) {
+    if (sortQuery.ascending === null) {
+      sortQuery.ascending = true;
+    }
+    //@ts-ignore
+    query.order(sortQuery.column, { ascending: sortQuery.ascending });
+  }
+  if (limitQuery !== null) {
+    query.limit(limitQuery);
   }
   let { data, error } = await query;
   let obj: returnObject = {
@@ -29,6 +41,7 @@ export const getData = async ({
     const errorMessage = error;
     obj.status = 400;
     obj.data = errorMessage;
+    console.log(errorMessage);
   } else {
     obj.data = data;
   }

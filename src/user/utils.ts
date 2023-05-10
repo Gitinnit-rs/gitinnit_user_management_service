@@ -39,7 +39,6 @@ export const getUser = async (searchQuery: any) => {
   let query: searchParameters = {
     tableName: "user",
     matchQuery: searchQuery,
-    sortQuery: {},
   };
 
   if ("sort" in searchQuery) {
@@ -61,6 +60,8 @@ export const getUser = async (searchQuery: any) => {
     delete searchQuery.select;
   }
   query.matchQuery = searchQuery;
+
+  console.log(query);
   let users = await getData(query);
   if (users.status !== 200) {
     return {

@@ -101,6 +101,8 @@ router.get("/followers/:id", async (req, res) => {
 // UPDATE USER
 router.patch("/", resolveAccessToken, async (req, res) => {
   try {
+    req.body.id = req.body.artist_id;
+    delete req.body.artist_id;
     const { id, user } = req.body;
     const data = await updateUser(id, user);
     res.status(data.status).send(data.data);

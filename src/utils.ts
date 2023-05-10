@@ -11,7 +11,7 @@ export const searchByName = async (name: string) => {
   };
   let query = {
     tableName: "user",
-    selectQuery: "name, id",
+    selectQuery: "name, id, profile_photo, username",
     likeQuery: "%" + name + "%",
   };
 
@@ -23,7 +23,7 @@ export const searchByName = async (name: string) => {
 
   query = {
     tableName: "music",
-    selectQuery: "name, id",
+    selectQuery: "name, id, cover_url",
     likeQuery: "%" + name + "%",
   };
   let musics = await getSimilarData(query);
@@ -34,7 +34,7 @@ export const searchByName = async (name: string) => {
 
   query = {
     tableName: "album",
-    selectQuery: "name, id",
+    selectQuery: "name, id, cover_url",
     likeQuery: "%" + name + "%",
   };
   let albums = await getSimilarData(query);

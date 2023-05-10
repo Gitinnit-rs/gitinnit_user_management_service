@@ -23,10 +23,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 // CREATE a new post
 router.post("/", upload.any(), resolveAccessToken, async (req, res) => {
   try {
-    if (req.files?.length === 0) {
-      res.status(400).send("No music file found");
-      return;
-    } else {
+    if (req.files && +req.files.length > 0) {
       const fileId: string = uuid();
       const image_url = await addFileToStorage(
         "images",

@@ -18,7 +18,10 @@ export const addFileToStorage = async (
   artist_id: string,
 ) => {
   if (type !== "music" && type !== "images") {
-    return { status: 400, data: "Error while adding music file" };
+    return {
+      status: 400,
+      data: "Error while adding file. Invalid type" + type,
+    };
   }
   const fileOptions = {
     contentType: file.mimetype,

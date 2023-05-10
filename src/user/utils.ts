@@ -38,7 +38,6 @@ export const getUser = async (searchQuery: any) => {
     matchQuery: searchQuery,
   };
   let users = await getData(query);
-  console.log(users);
   if (users.status !== 200) {
     return {
       data: "Couldn't get user",

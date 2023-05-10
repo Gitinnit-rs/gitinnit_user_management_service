@@ -22,8 +22,6 @@ const upload = multer({ storage: multer.memoryStorage() });
 // CREATE MUSIC
 router.post("/", upload.any(), resolveAccessToken, async (req, res) => {
   try {
-    console.log(req.files);
-    console.log(req.body);
     if (!req.files) {
       res.status(400).send("NO FILE FOUND");
       return;
@@ -48,7 +46,6 @@ router.post("/", upload.any(), resolveAccessToken, async (req, res) => {
         }),
       );
       const { name, artist_id, tags, genre, artists } = req.body;
-      console.log(req.body, musicFile, imageFile);
       const obj = await addMusicFile(
         musicFile,
         imageFile,

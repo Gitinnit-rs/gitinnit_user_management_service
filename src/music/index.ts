@@ -57,8 +57,8 @@ router.post("/", upload.any(), resolveAccessToken, async (req, res) => {
       );
       res.status(obj.status).send(obj.data);
     }
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (e: any) {
+    res.status(400).send(e.message);
   }
 });
 
@@ -68,8 +68,8 @@ router.get("", async (req, res) => {
     const searchQuery = req.query;
     const obj = await getMusic(searchQuery);
     res.status(obj.status).send(obj.data);
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (e: any) {
+    res.status(400).send(e.message);
   }
 });
 // GET MUSIC
@@ -78,8 +78,8 @@ router.get("/name/:name", async (req, res) => {
     const { name } = req.params;
     const obj = await getMusicByName(name);
     res.status(obj.status).send(obj.data);
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (e: any) {
+    res.status(400).send(e.message);
   }
 });
 
@@ -95,8 +95,8 @@ router.post("/album", upload.any(), resolveAccessToken, async (req, res) => {
     const coverFile = (req.files as Express.Multer.File[])[0];
     const obj = await createAlbum(coverFile, name, musics, artist_id);
     res.status(obj.status).send(obj.data);
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (e: any) {
+    res.status(400).send(e.message);
   }
 });
 
@@ -106,8 +106,8 @@ router.get("/album", async (req, res) => {
     const searchQuery = req.query;
     const obj = await getAlbum(searchQuery);
     res.status(obj.status).send(obj.data);
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (e: any) {
+    res.status(400).send(e.message);
   }
 });
 
@@ -117,8 +117,8 @@ router.get("/album/name/:name", async (req, res) => {
     const { name } = req.params;
     const obj = await getAlbumByName(name);
     res.status(obj.status).send(obj.data);
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (e: any) {
+    res.status(400).send(e.message);
   }
 });
 
@@ -130,8 +130,8 @@ router.post("/mapping/", resolveAccessToken, async (req, res) => {
     const { artist_id, album_id, musics } = req.body;
     const obj = await addMusicAlbumMapping(artist_id, album_id, musics);
     res.status(obj.status).send(obj.data);
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (e: any) {
+    res.status(400).send(e.message);
   }
 });
 
@@ -143,8 +143,8 @@ router.post("/delete_mapping/", resolveAccessToken, async (req, res) => {
     const { artist_id, album_id, musics } = req.body;
     const obj = await removeMusicAlbumMapping(artist_id, album_id, musics);
     res.status(obj.status).send(obj.data);
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (e: any) {
+    res.status(400).send(e.message);
   }
 });
 

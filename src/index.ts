@@ -27,8 +27,8 @@ app.get("/search/:name", async (req, res) => {
     const obj = await searchByName(name);
     res.status(obj.status).send(obj.data);
     return;
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (e: any) {
+    res.status(400).send(e.message);
   }
 });
 

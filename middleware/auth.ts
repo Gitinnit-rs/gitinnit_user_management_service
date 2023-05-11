@@ -24,7 +24,7 @@ export const resolveAccessToken = async (req, res, next) => {
     }
     req.body.artist_id = data.id;
     next();
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (e: any) {
+    res.status(400).send(e.message);
   }
 };

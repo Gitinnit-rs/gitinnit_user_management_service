@@ -50,6 +50,12 @@ export const addFileToStorage = async (
 
 // CREATE POST
 export const createPost = async (post: Post) => {
+  if (post.type !== "text" && post.content_id === null) {
+    return {
+      status: 400,
+      data: "No content id found for the type:" + post.type,
+    };
+  }
   return await insertRow("post", post);
 };
 
@@ -57,7 +63,6 @@ export const createPost = async (post: Post) => {
 export const getPost = async (searchQuery: object) => {
   const query: searchParameters = {
     tableName: "post",
-    matchQuery: searchQuery,
   };
   if ("sort" in searchQuery) {
     //@ts-ignore
@@ -81,7 +86,6 @@ export const getPost = async (searchQuery: object) => {
   }
   query.matchQuery = searchQuery;
   let posts = await getData(query);
-  console.log(posts);
   if (posts.status !== 200) {
     return {
       data: "Couldn't find posts",

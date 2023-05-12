@@ -65,6 +65,7 @@ export const getPost = async (searchQuery: object) => {
     tableName: "post",
   };
   if ("sort" in searchQuery) {
+    query.sortQuery = {};
     //@ts-ignore
     query.sortQuery.column = searchQuery.sort;
     if ("ascending" in searchQuery) {

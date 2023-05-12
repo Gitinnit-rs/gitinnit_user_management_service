@@ -130,9 +130,9 @@ export const addMusicFile = async (
 export const getMusic = async (searchQuery: object) => {
   const query = {
     tableName: "music",
-    matchQuery: searchQuery,
   };
   if ("sort" in searchQuery) {
+    query.sortQuery = {};
     //@ts-ignore
     query.sortQuery.column = searchQuery.sort;
     if ("ascending" in searchQuery) {
@@ -255,9 +255,9 @@ const getMusicForAlbum = async (album_id: string) => {
 export const getAlbum = async (searchQuery: object) => {
   let query = {
     tableName: "album",
-    matchQuery: searchQuery,
   };
   if ("sort" in searchQuery) {
+    query.sortQuery = {};
     //@ts-ignore
     query.sortQuery.column = searchQuery.sort;
     if ("ascending" in searchQuery) {

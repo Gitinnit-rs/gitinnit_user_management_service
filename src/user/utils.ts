@@ -41,6 +41,7 @@ export const getUser = async (searchQuery: any) => {
   };
 
   if ("sort" in searchQuery) {
+    query.sortQuery = {};
     //@ts-ignore
     query.sortQuery.column = searchQuery.sort;
     if ("ascending" in searchQuery) {

@@ -22,7 +22,6 @@ export const getUser = async (searchQuery: any) => {
   let includeMusic = false;
   let includeAlbum = false;
   let includePost = false;
-  console.log(searchQuery);
   if ("includeMusic" in searchQuery) {
     includeMusic = searchQuery.includeMusic;
     delete searchQuery.includeMusic;
@@ -61,7 +60,6 @@ export const getUser = async (searchQuery: any) => {
   }
   query.matchQuery = searchQuery;
 
-  console.log(query);
   let users = await getData(query);
   if (users.status !== 200) {
     return {
